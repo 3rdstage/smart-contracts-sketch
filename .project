@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>smart-contracts</name>
-	<comment></comment>
+	<comment>Highly reliable and reusable smart contracts</comment>
 	<projects>
 	</projects>
 	<buildSpec>
