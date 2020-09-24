@@ -1,0 +1,27 @@
+{
+  "name": "smart-contracts",
+  "description": "Highly reliable and reusable smart contracts",
+  "keywords": [
+    "Smart Contract",
+    "Ethereum",
+    "Solidity"
+  ],
+  "version": "0.1.0",
+  "dependencies": {
+    "@openzeppelin/contracts": "^3.1.0",
+    "@truffle/core": "^5.1.42",
+    "@truffle/hdwallet-provider": "^1.1.0",
+    "web3": "^1.2.7"
+  },
+  "devDependencies": {
+    "chance": "^1.1.7",
+    "@openzeppelin/test-helpers": "^0.5.6",
+    "@openzeppelin/test-environment": "^0.1.4"
+  },
+  "scripts": {
+    "//": [
+      "https://github.com/OpenZeppelin/zeppelin-solidity#getting-started"
+    ],
+    "preinstall": ""
+  }
+}
