@@ -9,11 +9,6 @@ readonly dryrun=0   # 1: true, 0: false - Not Used Yet
 readonly uname=`uname -s`  # OS type
 readonly script_dir=$(cd `dirname $0` && pwd)
 
-if [ -z "$BIP39_MNEMONIC" ]; then
-  echo "Environmental variable of 'BIP39_MNEMONIC' should be defined to run this script."
-  exit 100
-fi
-
 declare data_dir
 declare log_dir
 case $uname in
@@ -111,10 +106,10 @@ fi
 
 case $uname in
 Linux)  #Linux
-  echo "The current system is 'Linux'"
+  echo "Current system is 'Linux'"
   ;;
 MINGW*)  #Git Bash on Windows
-  echo "The curreun system is 'Windows'"
+  echo "Curreun system is 'Windows'"
   # check whether the address is alreasy in use or not
   if [ `netstat -anp tcp | awk '$4 == "LISTENING" {print $2}' | grep -E "^($eth_host|0.0.0.0):$eth_port$" | wc -l` -gt 0 ]; then
     readonly pid=`netstat -anop tcp | awk '$4 == "LISTENING" {print $2 " " $5}' | grep -E "^($eth_host|0.0.0.0):$eth_port\s" | head -n 1 | awk '{print $2}'`
@@ -124,10 +119,10 @@ MINGW*)  #Git Bash on Windows
   fi
   ;;
 Darwin*) #Bash on macOS
-  echo "The current system is 'macOS'"
+  echo "Current system is 'macOS'"
   ;;
 *)
-  echo "The current system is Unknown of which 'uname -s' shows '$uname'."
+  echo "Current system is Unknown of which 'uname -s' shows '$uname'."
   exit 600
 esac
 
@@ -143,12 +138,21 @@ cmd="ganache-cli --networkId $eth_ver \
             --host '$eth_host' \
             --port $eth_port \
             --gasPrice $eth_gas_price \
-            --gasLimit $eth_gas_limit \
-            --mnemonic '$BIP39_MNEMONIC' \
-            --defaultBalanceEther 10000 \
+            --gasLimit $eth_gas_limit"
+
+if [ -z "$BIP39_MNEMONIC" ]; then
+  echo "'BIP39_MNEMONIC' env. variable is not defined, so implicit default mnemonic will be used."
+  echo "If you want to use user defined mnemonic, define it via 'BIP39_MNEMONIC' env. variable and restart this script."
+  cmd="${cmd} --deterministic"
+else
+  echo "'BIP39_MNEMONIC' env. variable is defined, so it will be used."
+  cmd="${cmd} --mnemonic '$BIP39_MNEMONIC'"
+fi
+
+cmd="${cmd} --defaultBalanceEther 10000 \
             --accounts 10 --secure \
             --unlock 0 --unlock 1 --unlock 2 --unlock 3 --unlock 4 \
-            -k 'constantinople' \
+            --hardfork 'petersburg' \
             --blockTime 0 \
             --db '${data_dir}' >> '${log_dir}'/ganache.log 2>&1"
 
@@ -166,10 +170,12 @@ if [ $dryrun -ne 0 ]; then
 fi
 
 if [ $backgrounds -eq 0 ]; then
+  echo ""
   echo $cmd
   eval $cmd
 else
   cmd=$cmd' &'
+  echo ""
   echo $cmd
   eval $cmd
 
