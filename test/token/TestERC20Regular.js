@@ -22,10 +22,10 @@ contract("ERC20Practical Contract Test Suite", async accounts => {
 
 
   // avoid too many accounts
-  if(accounts.length > 8) accounts = accounts.slice(0, 8);
+  if(accounts.length > 8) accounts = (new Chance()).pickset(accounts, 8);
 
-  const creator1 = accounts[0];  // default token creator in test - admin, minter, pauser
-  const creator2 = accounts[1];
+  //const creator1 = accounts[0];  // default token creator in test - admin, minter, pauser
+  //const creator2 = accounts[1];
 
   const EventNames = {
       Transfer: 'Transfer',
@@ -56,13 +56,12 @@ contract("ERC20Practical Contract Test Suite", async accounts => {
       const symbol = chance.word({length: chance.natural({min: 1, max: 5})}).toUpperCase();
       const admin = chance.pickone(accounts);
       const token = await Token.new(name, symbol, {from: admin});
-      console.debug(`New token deployed into ${token.address}`);
-      console.debug(`   Name: '${name}', Symbol: '${symbol}'`);
+      console.debug(`New TrustedToken contract deployed - name: ${name}, symbol: ${symbol}, address: ${token.address}`);
 
       // inquire and verify token's name, symbol and decimals
       assert.equal(await token.name(), name);
       assert.equal(await token.symbol(), symbol);
-      assert.isTrue((await token.decimals()).eq(toBN(18)));
+      assert.isTrue((await token.decimals()).eqn(18));
     });
 
 
