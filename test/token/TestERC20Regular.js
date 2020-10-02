@@ -173,7 +173,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
     })
   });
 
-  describe.only("Transfer", () => {
+  describe("Transfer", () => {
     
     // mint(), balanceOf(), transfer()
     it("Can transfer decreasing sender's balance and increasing recipient's balance as much.", async() => {
@@ -217,6 +217,27 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       }
     });  
 
+    it("Can't transfer to ZERO address from any account", async() => {
+      const chance = new Chance();
+      const admin = chance.pickone(accounts);
+      const token = await Token.new('Color Token', 'RGB', {from: admin});
+      console.debug(`New token contract deployed - address: ${token.address}`);
+
+      // mint initial balances to all accounts
+      let balance = 0;
+      for(const acct of accounts){
+        balance = toBN(1E9).muln(chance.natural({min: 1, max: 100}));
+        await token.mint(acct, balance, {from: admin});
+      }
+      
+      const loops = 20;
+      let delta = 0;
+      for(const acct of accounts){
+        delta = toBN(1E3).muln(chance.natural({min: 0, max: 100}));
+        expectRevert(token.transfer('0x0', delta, {from: acct}), "invalid address");
+      }
+    });
+
     
     // mint(), balanceOf(), transfer()
     it("Can transfer to oneself, although it seems a little bit silly", async() => {
@@ -258,7 +279,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       // mint initial balances to all accounts
       let balance = 0;
       for(const acct of accounts){
-        balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
+        balance = toBN(1E5).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, balance, {from: admin});
       }
       
@@ -270,10 +291,10 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
         recipient = chance.pickone(accounts);
         await token.transfer(sender, delta, {from: sender});
       }      
-    })
+    });
     
-
-    // mint(), balanceOf(), transfer()
+    
+   // mint(), balanceOf(), transfer()
     it("Should not change balances of irrelative accounts(neither sender nor recipient).", async() => {
       const chance = new Chance();
       const admin = chance.pickone(accounts);
@@ -309,7 +330,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
             "Transfer should not change balance of irrelative accounts");
         }
       }
-    });
+    });    
     
     
     // mint(), totalSupply(), transfer()
@@ -370,10 +391,12 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
             EventNames.Transfer, {0: sender, 1: recipient, 2: delta.toString()});
       }
     });  
+
+
   });
 
 
-  describe("Approval", () => {
+  describe.only("Approval", () => {
 
     it("Should setup zero for allowances of all accounts at initial state.", async() => {
       const chance = new Chance();
@@ -381,6 +404,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       const token = await Token.new('Color Token', 'RGB', {from: admin});
       console.debug(`New token contract deployed - address: ${token.address}`);
 
+      let allowance = 0;
       for(const owner of accounts){
         for(const spender of accounts){
            allowance = await token.allowance(owner, spender);
@@ -391,6 +415,23 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       }
     });
     
+    
+    it("Can appove and inquire allowance to an account for another account.", async() => {
+      const chance = new Chance();
+      const admin = chance.pickone(accounts);
+      const token = await Token.new('Color Token', 'RGB', {from: admin});
+      console.debug(`New token contract deployed - address: ${token.address}`);
+      
+      const loops = 20;
+      let allowance = 0;
+      for(let i = 0; i < loops; i++){
+        
+        
+      }
+      
+            
+      
+    });
   });
 
 
