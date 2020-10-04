@@ -143,7 +143,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       for(const acct of accounts){
         amt = toBN(1E17).muln(chance.natural({min: 1, max: 100}));
         // tryer is not minter or admin yet
-        expectRevert.unspecified(token.mint(acct, amt, {from: tryer}));
+        await expectRevert.unspecified(token.mint(acct, amt, {from: tryer}));
       }
 
       // maker tryer minter
@@ -234,13 +234,13 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       let delta = 0;
       for(const acct of accounts){
         delta = toBN(1E3).muln(chance.natural({min: 0, max: 100}));
-        expectRevert(token.transfer('0x0', delta, {from: acct}), "invalid address");
+        await expectRevert(token.transfer('0x0', delta, {from: acct}), "invalid address");
       }
     });
 
     
     // mint(), balanceOf(), transfer()
-    it("Can transfer to oneself, although it seems a little bit silly", async() => {
+    it("Can transfer to oneself, although it seems a little bit silly.", async() => {
       const chance = new Chance();
       const admin = chance.pickone(accounts);
       const token = await Token.new('Color Token', 'RGB', {from: admin});
@@ -391,13 +391,12 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
             EventNames.Transfer, {0: sender, 1: recipient, 2: delta.toString()});
       }
     });  
-
-
   });
 
 
-  describe.only("Approval", () => {
-
+  describe("Approval", () => {
+  
+    // allowance()
     it("Should setup zero for allowances of all accounts at initial state.", async() => {
       const chance = new Chance();
       const admin = chance.pickone(accounts);
@@ -408,14 +407,13 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       for(const owner of accounts){
         for(const spender of accounts){
            allowance = await token.allowance(owner, spender);
-           
            assert.isTrue(allowance.eqn(0), "...");
-          
         }
       }
     });
     
     
+    // approve() allowance()
     it("Can appove and inquire allowance to an account for another account.", async() => {
       const chance = new Chance();
       const admin = chance.pickone(accounts);
@@ -423,19 +421,162 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       console.debug(`New token contract deployed - address: ${token.address}`);
       
       const loops = 20;
+      let owner = null, spender = null;
       let allowance = 0;
       for(let i = 0; i < loops; i++){
+        owner = chance.pickone(accounts);
+        do{ spender = chance.pickone(accounts); }while(spender == owner)
+        allowance = toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
         
+        await token.approve(spender, allowance, {from: owner});
         
+        //console.debug(`allowance: ${allowance} = ${await token.allowance(owner, spender)}`);
+        assert.isTrue((await token.allowance(owner, spender)).eq(allowance), 
+          "Appoval dosen't setup allowance correctly or inquiry dosen't work correctly for address ${owner.substr(0, 10)}");
       }
-      
-            
-      
     });
+    
+
+    // approve() allowance()
+    it("Can't approve allowance to ZERO account.", async() => {
+      const chance = new Chance();
+      const admin = chance.pickone(accounts);
+      const token = await Token.new('Color Token', 'RGB', {from: admin});
+      console.debug(`New token contract deployed - address: ${token.address}`);
+      
+      let allowance = 0;
+      for(const acct of accounts){
+        allowance = toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
+        if(chance.bool({ likelihood: 10})) allowance = toBN(0);
+
+        await expectRevert(token.approve('0x0', allowance, {from: acct}), "invalid address");
+      }
+    });
+    
+
+    // approve() allowance()
+    it("Can approve allowance oneself, although it seems a little bit silly.", async() => {
+      const chance = new Chance();
+      const admin = chance.pickone(accounts);
+      const token = await Token.new('Color Token', 'RGB', {from: admin});
+      console.debug(`New token contract deployed - address: ${token.address}`);
+      
+      let allowance = 0;
+      for(const acct of accounts){
+        allowance = toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
+        await token.approve(acct, allowance, {from: acct});
+        assert.isTrue((await token.allowance(acct, acct)).eq(allowance), 
+          "Appoval dosen't setup allowance correctly or inquiry dosen't work correctly for address ${owner.substr(0, 10)}");
+      }
+    });
+
+
+    // approve() allowance()
+    it("Can approve zero allowance, although it seems a little bit silly.", async() => {
+      const chance = new Chance();
+      const admin = chance.pickone(accounts);
+      const token = await Token.new('Color Token', 'RGB', {from: admin});
+      console.debug(`New token contract deployed - address: ${token.address}`);
+      
+      const loops = 10;
+      let owner = null, spender = null;
+      for(let i = 0; i < loops; i++){
+        owner = chance.pickone(accounts);
+        spender = chance.pickone(accounts);
+        
+        await token.approve(spender, toBN(0), {from: owner});
+        console.debug(`owner: ${owner.substr(0, 10)}, spender: ${spender.substr(0, 10)}`);
+        assert.isTrue((await token.allowance(owner, spender)).eqn(0), 
+          `Approval 0 allowance for ${owner.substr(0, 10)} to ${spender.substr(0, 10)} doesn't work correctly.`);
+      }      
+    });
+    
+    
+    // approve()
+    it("Shoud fire 'Approval' event after approval.", async() => {
+      const chance = new Chance();
+      const admin = chance.pickone(accounts);
+      const token = await Token.new('Color Token', 'RGB', {from: admin});
+      console.debug(`New token contract deployed - address: ${token.address}`);
+      
+      const loops = 10;
+      let owner = null, spender = null;
+      let allowance = 0;
+      for(let i = 0; i < loops; i++){
+        owner = chance.pickone(accounts);
+        spender = chance.pickone(accounts);
+        allowance = toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
+        if(chance.bool({ likelihood: 10})) allowance = toBN(0);
+        
+        expectEvent(await token.approve(spender, allowance, {from: owner}),
+          EventNames.Approval, {0: owner, 1: spender, 2: allowance.toString()});
+      }
+    });
+    
   });
 
 
-  describe("Delegated Transfer", () => {
+  describe.only("Delegated Transfer", () => {
+    
+    // transferFrom()
+    it("Should not allow delegated transfer without previous approval.", async() => {
+      const chance = new Chance();
+      const admin = chance.pickone(accounts);
+      const token = await Token.new('Color Token', 'RGB', {from: admin});
+      console.debug(`New token contract deployed - address: ${token.address}`);
+      
+      // mint initial balances to all accounts
+      let balance = 0;
+      for(const acct of accounts){
+        balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
+        await token.mint(acct, balance, {from: admin});
+      }      
+      
+      // try none-zero transfer without any approval
+      const loops = 20;
+      let delta = 0;
+      let spender = null, recipient = null;
+      for(const sender of accounts){
+        spender = chance.pickone(accounts);
+        recipient = chance.pickone(accounts);
+        delta = toBN(1E5).muln(chance.natural({min: 1, max: 100}));
+        
+        await expectRevert.unspecified(token.transferFrom(sender, recipient, delta, {from: spender}));
+      }
+    });
+
+
+    // transferFrom()
+    it("Should allow delegated transfer of ZERO amount without previous approval, although it seems a little bit silly.", async() => {
+      const chance = new Chance();
+      const admin = chance.pickone(accounts);
+      const token = await Token.new('Color Token', 'RGB', {from: admin});
+      console.debug(`New token contract deployed - address: ${token.address}`);
+      
+      // mint initial balances to all accounts
+      let balance = 0;
+      for(const acct of accounts){
+        balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
+        await token.mint(acct, balance, {from: admin});
+      }      
+      
+      // try none-zero transfer without any approval
+      const loops = 20;
+      let delta = 0;
+      let spender = null, recipient = null;
+      for(const sender of accounts){
+        spender = chance.pickone(accounts);
+        recipient = chance.pickone(accounts);
+        
+        await token.transferFrom(sender, recipient, toBN(0), {from: spender});
+      }
+    });
+
+
+    it("Should allow an approved account to transfer instead of the owner within allowance.", async() => {
+      // TODO
+      
+    });
 
 
   });
