@@ -555,8 +555,45 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
 
     it("Should allow an approved account to transfer instead of the owner within allowance.", async() => {
-      // TODO
+      const chance = new Chance();
+      const admin = chance.pickone(accounts);
+      const token = await Token.new('Color Token', 'RGB', {from: admin});
+      console.debug(`New token contract deployed - address: ${token.address}`);
 
+      // mint initial balances to all accounts
+      let balance = 0;
+      for(const acct of accounts){
+        balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
+        await token.mint(acct, balance, {from: admin});
+      }
+
+      let spender = null, recipient = null;
+      let allowance = 0, delta = 0;
+      for(const owner of accounts){
+        do{ spender = chance.pickone(accounts); }while(spender == owner)
+        do{ recipient = chance.pickone(accounts); }while(recipient == owner)
+
+        allowance = toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
+
+        // amount to transfer is less or equal than/to the allowance
+        if(chance.bool({likelihood: 20})){
+          delta = allowance;
+        }else{
+          delta = allowance.divn(100).muln(chance.natural({min: 1, max: 99}));
+        }
+
+        // try to delegated transfer to other account
+        await token.approve(spender, allowance, {from: owner});
+        await token.transferFrom(owner, recipient, delta, {from: spender});
+
+        // try to delegated transfer to approved account
+        await token.approve(spender, allowance, {from: owner});
+        await token.transferFrom(owner, spender, delta, {from: spender});
+
+        // try to delegated transfer to the owner
+        await token.approve(spender, allowance, {from: owner});
+        await token.transferFrom(owner, owner, delta, {from: spender});
+      }
     });
 
 
