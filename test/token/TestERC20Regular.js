@@ -28,6 +28,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
   //const creator1 = accounts[0];  // default token creator in test - admin, minter, pauser
   //const creator2 = accounts[1];
 
+  const ZeroAddress = '0x0000000000000000000000000000000000000000';
   const EventNames = {
       Transfer: 'Transfer',
       Approval: 'Approval'
@@ -217,7 +218,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       let delta = 0;
       for(const acct of accounts){
         delta = toBN(1E3).muln(chance.natural({min: 0, max: 100}));
-        await expectRevert(token.transfer('0x0', delta, {from: acct}), "invalid address");
+        await expectRevert.unspecified(token.transfer(ZeroAddress, delta, {from: acct}));
       }
     });
 
@@ -430,7 +431,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
         allowance = toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
         if(chance.bool({ likelihood: 10})) allowance = toBN(0);
 
-        await expectRevert(token.approve('0x0', allowance, {from: acct}), "invalid address");
+        await expectRevert.unspecified(token.approve(ZeroAddress, allowance, {from: acct}));
       }
     });
 
