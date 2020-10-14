@@ -1,8 +1,7 @@
-
 const Token = artifacts.require("ERC20Regular");
 const Chance = require('chance');
-const { BN, constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 const toBN = web3.utils.toBN;
+const { expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 
 //References
 //Truffle test in JavaScript : https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript
@@ -24,9 +23,6 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
   // avoid too many accounts
   if(accounts.length > 8) accounts = (new Chance()).pickset(accounts, 8);
-
-  //const creator1 = accounts[0];  // default token creator in test - admin, minter, pauser
-  //const creator2 = accounts[1];
 
   const ZeroAddress = '0x0000000000000000000000000000000000000000';
   const EventNames = {
