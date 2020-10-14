@@ -183,8 +183,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
         recipientBal1 = await token.balanceOf(recipient);
 
         // amount to transfer can be ZERO
-        delta = toBN(1E10).muln(chance.natural({min: 1, max: 1000000}));
-        if(chance.bool({likelihood: 10})) delta = toBN(0);
+        delta = chance.bool({likelihood: 10}) ? toBN(0) : toBN(1E10).muln(chance.natural({min: 1, max: 1000000}));
         await token.transfer(recipient, delta, {from: sender});
 
         senderBal2 = await token.balanceOf(sender);
@@ -424,9 +423,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
       let allowance = 0;
       for(const acct of accounts){
-        allowance = toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
-        if(chance.bool({ likelihood: 10})) allowance = toBN(0);
-
+        allowance = chance.bool({likelihood: 10}) ? toBN(0) : toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
         await expectRevert.unspecified(token.approve(ZeroAddress, allowance, {from: acct}));
       }
     });
@@ -483,14 +480,12 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       for(let i = 0; i < loops; i++){
         owner = chance.pickone(accounts);
         spender = chance.pickone(accounts);
-        allowance = toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
-        if(chance.bool({ likelihood: 10})) allowance = toBN(0);
+        allowance = chance.bool({likelihood: 10}) ? toBN(0) : toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
 
         expectEvent(await token.approve(spender, allowance, {from: owner}),
           EventNames.Approval, {0: owner, 1: spender, 2: allowance.toString()});
       }
     });
-
   });
 
 
@@ -571,13 +566,8 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
         do{ recipient = chance.pickone(accounts); }while(recipient == owner)
 
         allowance = toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
-
         // amount to transfer is less or equal than/to the allowance
-        if(chance.bool({likelihood: 20})){
-          delta = allowance;
-        }else{
-          delta = allowance.divn(100).muln(chance.natural({min: 1, max: 99}));
-        }
+        delta = chance.bool({likelihood: 20}) ? allowance : allowance.divn(100).muln(chance.natural({min: 1, max: 99}));
 
         // try to delegated transfer to other account
         await token.approve(spender, allowance, {from: owner});
