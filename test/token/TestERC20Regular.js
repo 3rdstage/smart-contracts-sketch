@@ -1,7 +1,7 @@
 const Token = artifacts.require("ERC20Regular");
 const Chance = require('chance');
 const toBN = web3.utils.toBN;
-const { expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
+const { constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 
 //References
 //Truffle test in JavaScript : https://www.trufflesuite.com/docs/truffle/testing/writing-tests-in-javascript
@@ -24,12 +24,19 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
   // avoid too many accounts
   if(accounts.length > 8) accounts = (new Chance()).pickset(accounts, 8);
 
-  const ZeroAddress = '0x0000000000000000000000000000000000000000';
   const EventNames = {
       Transfer: 'Transfer',
       Approval: 'Approval'
   }
 
+  async function createFixtures(){
+    const chance = new Chance();
+    const admin = chance.pickone(accounts);
+    const token = await Token.new('Color Token', 'RGB', {from: admin});
+    console.debug(`New token contract deployed - address: ${token.address}`);
+
+    return [chance, admin, token];
+  }
 
   before(async() => {
     const output = [];
@@ -43,15 +50,6 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
     console.debug(`The number of accounts : ${accounts.length}`);
     console.table(output);
   });
-
-  async function createFixtures(){
-    const chance = new Chance();
-    const admin = chance.pickone(accounts);
-    const token = await Token.new('Color Token', 'RGB', {from: admin});
-    console.debug(`New token contract deployed - address: ${token.address}`);
-
-    return [chance, admin, token];
-  }
 
   describe("Initial State", () => {
 
@@ -138,7 +136,6 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
         amt = toBN(1E17).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, amt, {from: tryer});
       }
-
     });
 
     it("Should fire 'Transfer' event after minting.", async() => {
@@ -203,7 +200,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       let delta = 0;
       for(const acct of accounts){
         delta = toBN(1E3).muln(chance.natural({min: 0, max: 100}));
-        await expectRevert.unspecified(token.transfer(ZeroAddress, delta, {from: acct}));
+        await expectRevert.unspecified(token.transfer(constants.ZERO_ADDRESS, delta, {from: acct}));
       }
     });
 
@@ -385,7 +382,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       let allowance = 0;
       for(const acct of accounts){
         allowance = chance.bool({likelihood: 10}) ? toBN(0) : toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
-        await expectRevert.unspecified(token.approve(ZeroAddress, allowance, {from: acct}));
+        await expectRevert.unspecified(token.approve(constants.ZERO_ADDRESS, allowance, {from: acct}));
       }
     });
 
