@@ -44,6 +44,15 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
     console.table(output);
   });
 
+  async function createFixtures(){
+    const chance = new Chance();
+    const admin = chance.pickone(accounts);
+    const token = await Token.new('Color Token', 'RGB', {from: admin});
+    console.debug(`New token contract deployed - address: ${token.address}`);
+
+    return [chance, admin, token];
+  }
+
   describe("Initial State", () => {
 
     // name(), symbol(), decimals()
@@ -86,21 +95,16 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // mint(), totalSupply(), balanceOf()
     it("Can mint tokens increasing the owners balance and total supply as much", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
-      const amt0 = toBN(1E17);
-      let amt = null;
-      let balance1 = 0, balance2 = 0;
+      let amt = 0, balance1 = 0, balance2 = 0;
       let total1 = 0, total2 = 0;
       for(const acct of accounts){
         balance1 = await token.balanceOf(acct);
         total1 = await token.totalSupply();
 
         // mint
-        amt = amt0.muln(chance.natural({min: 1, max: 100}));
+        amt = toBN(1E17).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, amt, {from: admin});
 
         balance2 = await token.balanceOf(acct);
@@ -113,10 +117,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // mint(), grantRole()
     it("Can mint token only by minters(accounts granted minter role).", async() =>{
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
       let tryer = null;
       // select any account other than admin
@@ -141,10 +142,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
     });
 
     it("Should fire 'Transfer' event after minting.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
       let amt = 0;
       for(const acct of accounts){
@@ -160,14 +158,10 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // mint(), balanceOf(), transfer()
     it("Can transfer decreasing sender's balance and increasing recipient's balance as much.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
-      // mint initial balances to all accounts
       let balance = 0;
-      for(const acct of accounts){
+      for(const acct of accounts){ // initial minting
         balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, balance, {from: admin});
       }
@@ -197,14 +191,10 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
     });
 
     it("Can't transfer to ZERO address from any account", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
-      // mint initial balances to all accounts
       let balance = 0;
-      for(const acct of accounts){
+      for(const acct of accounts){ // initial minting
         balance = toBN(1E9).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, balance, {from: admin});
       }
@@ -220,14 +210,10 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // mint(), balanceOf(), transfer()
     it("Can transfer to oneself, although it seems a little silly.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
-      // mint initial balances to all accounts
       let balance = 0;
-      for(const acct of accounts){
+      for(const acct of accounts){ // initial minting
         balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, balance, {from: admin});
       }
@@ -250,14 +236,10 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // mint(), balanceOf(), transfer()
     it("Can transfer zero amount, although such a empty transfer seems a little silly.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
-      // mint initial balances to all accounts
       let balance = 0;
-      for(const acct of accounts){
+      for(const acct of accounts){ // initial minting
         balance = toBN(1E5).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, balance, {from: admin});
       }
@@ -275,13 +257,9 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
    // mint(), balanceOf(), transfer()
     it("Should not change balances of irrelative accounts(neither sender nor recipient).", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
       console.debug(`This test case will take a little long time.`);
 
-      // mint initial balances to all accounts
       let balance = 0;
       for(const acct of accounts){
         balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
@@ -314,12 +292,8 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // mint(), totalSupply(), transfer()
     it("Should not change total supply at all after trasnfers.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
-      // mint initial balances to all accounts
       let balance = 0;
       for(const acct of accounts){
         balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
@@ -345,14 +319,10 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
 
     it("Should fire 'Transfer' event after transfer.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
-      // mint initial balances to all accounts
       let balance = 0;
-      for(const acct of accounts){
+      for(const acct of accounts){  // initial minting
         balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, balance, {from: admin});
       }
@@ -377,10 +347,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // allowance()
     it("Should setup zero for allowances of all accounts at initial state.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
       let allowance = 0;
       for(const owner of accounts){
@@ -394,10 +361,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // approve() allowance()
     it("Can appove and inquire allowance to an account for another account.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
       const loops = 20;
       let owner = null, spender = null;
@@ -416,10 +380,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // approve() allowance()
     it("Can't approve allowance to ZERO account.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
       let allowance = 0;
       for(const acct of accounts){
@@ -431,10 +392,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // approve() allowance()
     it("Can approve allowance oneself, although it seems a little silly.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
       let allowance = 0;
       for(const acct of accounts){
@@ -448,10 +406,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // approve() allowance()
     it("Can approve zero allowance, although it seems a little silly.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
       const loops = 10;
       let owner = null, spender = null;
@@ -469,10 +424,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // approve()
     it("Shoud fire 'Approval' event after approval.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
       const loops = 10;
       let owner = null, spender = null;
@@ -493,14 +445,10 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // transferFrom()
     it("Should not allow delegated transfer without previous approval.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
-      // mint initial balances to all accounts
       let balance = 0;
-      for(const acct of accounts){
+      for(const acct of accounts){ // initial minting
         balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, balance, {from: admin});
       }
@@ -521,14 +469,10 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
     // transferFrom()
     it("Should allow delegated transfer of ZERO amount without previous approval, although it seems a little silly.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
-      // mint initial balances to all accounts
       let balance = 0;
-      for(const acct of accounts){
+      for(const acct of accounts){ // initial minting
         balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, balance, {from: admin});
       }
@@ -547,14 +491,10 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
 
     it("Should allow an approved account to transfer instead of the owner within allowance.", async() => {
-      const chance = new Chance();
-      const admin = chance.pickone(accounts);
-      const token = await Token.new('Color Token', 'RGB', {from: admin});
-      console.debug(`New token contract deployed - address: ${token.address}`);
+      const [chance, admin, token] = await createFixtures();
 
-      // mint initial balances to all accounts
       let balance = 0;
-      for(const acct of accounts){
+      for(const acct of accounts){ // initial minting
         balance = toBN(1E19).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, balance, {from: admin});
       }
