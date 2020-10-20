@@ -40,11 +40,9 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
   before(async() => {
     const output = [];
-    let balance = 0;
     for(const acct of accounts){
       await web3.eth.personal.unlockAccount(acct);
-      balance = await web3.eth.getBalance(acct);
-      await output.push([acct, balance]);
+      await output.push([acct, await web3.eth.getBalance(acct)]);
     }
 
     console.debug(`The number of accounts : ${accounts.length}`);
@@ -77,7 +75,6 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
       const total = await token.totalSupply();
       const paused = await token.paused();
-
       assert.isTrue(total.isZero());
       assert.isFalse(paused);
 
@@ -101,13 +98,11 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
         balance1 = await token.balanceOf(acct);
         total1 = await token.totalSupply();
 
-        // mint
         amt = toBN(1E17).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, amt, {from: admin});
 
         balance2 = await token.balanceOf(acct);
         total2 = await token.totalSupply();
-
         assert.isTrue(balance2.eq(balance1.add(amt)), "Minting should increase balance of the minted account as much.");
         assert.isTrue(total2.eq(total1.add(amt)), "Minting should increase total supply as much.");
       }
@@ -122,17 +117,14 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       do{ tryer = chance.pickone(accounts); }while(tryer == admin)
 
       let amt = 0;
-      for(const acct of accounts){
+      for(const acct of accounts){ // tryer is not minter or admin yet
         amt = toBN(1E17).muln(chance.natural({min: 1, max: 100}));
-        // tryer is not minter or admin yet
         await expectRevert.unspecified(token.mint(acct, amt, {from: tryer}));
       }
 
       // maker tryer minter
       await token.grantRole(await token.MINTER_ROLE(), tryer, {from: admin});
-
-      // try again as a minter
-      for(const acct of accounts){
+      for(const acct of accounts){ // try again as a minter
         amt = toBN(1E17).muln(chance.natural({min: 1, max: 100}));
         await token.mint(acct, amt, {from: tryer});
       }
@@ -164,8 +156,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       }
 
       const loops = 20;
-      let sender = null, recipient = null;
-      let delta = 0;
+      let sender = 0, recipient = 0, delta = 0;
       let senderBal1 = 0, senderBal2 = 0;
       let recipientBal1 = 0, recipientBal2 = 0;
       for(let i = 0; i < loops; i++){
@@ -196,7 +187,6 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
         await token.mint(acct, balance, {from: admin});
       }
 
-      const loops = 20;
       let delta = 0;
       for(const acct of accounts){
         delta = toBN(1E3).muln(chance.natural({min: 0, max: 100}));
@@ -241,8 +231,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
         await token.mint(acct, balance, {from: admin});
       }
 
-      const loops = 20;
-      const delta = 0;
+      const loops = 20, delta = 0;
       let sender = null, recipient = null;;
       for(let i = 0; i < loops; i++){
         sender = chance.pickone(accounts);
@@ -288,7 +277,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
 
     // mint(), totalSupply(), transfer()
-    it("Should not change total supply at all after trasnfers.", async() => {
+    it("Should not change total supply at all after transfers.", async() => {
       const [chance, admin, token] = await createFixtures();
 
       let balance = 0;
@@ -301,8 +290,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       console.debug(`Total Supply : ${total.toString().toLocaleString()}`);
 
       const loops = 20;
-      let delta = 0;
-      let sender = null, recipient = null;
+      let delta = 0, sender = 0, recipient = 0;
       for(let i = 0; i < loops; i++){
         sender = chance.pickone(accounts);
         recipient = chance.pickone(accounts);
@@ -325,8 +313,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       }
 
       const loops = 20;
-      let delta = 0;
-      let sender = null, recipient = null;
+      let delta = 0, sender = 0x0, recipient = 0x0;
       for(let i = 0; i < loops; i++){
         sender = chance.pickone(accounts);
         recipient = chance.pickone(accounts);
@@ -361,8 +348,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
       const [chance, admin, token] = await createFixtures();
 
       const loops = 20;
-      let owner = null, spender = null;
-      let allowance = 0;
+      let owner = 0x0, spender = 0x0, allowance = 0;
       for(let i = 0; i < loops; i++){
         [owner, spender] = chance.pickset(accounts, 2);
         allowance = toBN(1E5).muln(chance.natural({min: 1, max: 1000000}));
@@ -420,7 +406,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
 
 
     // approve()
-    it("Shoud fire 'Approval' event after approval.", async() => {
+    it("Should fire 'Approval' event after approval.", async() => {
       const [chance, admin, token] = await createFixtures();
 
       const loops = 10;
