@@ -38,7 +38,7 @@ contract("ERC20Regular Contract Test Suite", async accounts => {
     return [chance, admin, token];
   }
 
-  before(async() => {
+  before(async () => {
     const output = [];
     for(const acct of accounts){
       await web3.eth.personal.unlockAccount(acct);

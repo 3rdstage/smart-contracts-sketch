@@ -8,8 +8,15 @@ import "../../node_modules/@openzeppelin/contracts/presets/ERC20PresetMinterPaus
 // ERC20Pausable.sol : https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v3.1.0/contracts/token/ERC20/ERC20Pausable.sol
 
 contract ERC20Regular is ERC20PresetMinterPauser{
+    
+  modifier onlyAdmin(){
+      require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Aadmin role is required to do this");
+      _;
+  }
 
   constructor(string memory _name, string memory _symbol) public ERC20PresetMinterPauser(_name, _symbol){ }
+
+
 
 }
 

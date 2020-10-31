@@ -10,6 +10,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^3.1.0",
     "@truffle/hdwallet-provider": "^1.1.0",
+    "remixd": "^0.2.4-alpha.0",
     "web3": "^1.2.7"
   },
   "devDependencies": {
@@ -17,7 +18,9 @@
     "@openzeppelin/test-helpers": "^0.5.6",
     "@openzeppelin/test-environment": "^0.1.4"
   },
-  "engines" : { "node" : ">=0.9" },
+  "engines": {
+    "node": ">=0.9"
+  },
   "scripts": {
     "//": [
       "https://docs.npmjs.com/files/package.json",
