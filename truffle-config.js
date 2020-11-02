@@ -5,21 +5,24 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 // Read properties for local standalone Ganache CLI node
 const fs = require('fs');
 const config = fs.readFileSync('scripts/ganache-cli.properties').toString();
-const net  = config.match(/ethereum.netVersion=[0-9]*/g)[0].substring(20);
-const host = config.match(/ethereum.host=.*/g)[0].substring(14);
-const port = config.match(/ethereum.port=[0-9]*/g)[0].substring(14);
-
+const ganache = {
+  host : config.match(/ethereum.host=.*/g)[0].substring(14),
+  port : config.match(/ethereum.port=[0-9]*/g)[0].substring(14),
+  net : config.match(/ethereum.netVersion=[0-9]*/g)[0].substring(20),
+  websocket: false
+}
 
 // http://truffleframework.com/docs/advanced/configuration
 module.exports = {
 
   networks: {
-      development: {
-      host: host,
-      port: port,
-      network_id: net,
+    development: {
+      host: ganache.host,
+      port: ganache.port,
+      network_id: ganache.net,
       gas: 3E8,
-      gasPrice: 0
+      gasPrice: 0,
+      websockets: ganache.websocket
     },
 
     //GitHub : https://github.com/ethereum/ropsten/
@@ -50,14 +53,15 @@ module.exports = {
     }
   },
 
-  // Set default mocha options here, use special reporters etc.
+  // https://github.com/mochajs/mocha/blob/v5.2.0/lib/mocha.js#L64
+  // https://mochajs.org/#command-line-usage
   mocha: {
     useColors: true,
     enableTimeouts: true,
     timeout: 180000
   },
 
-  // Configure your compilers
+  // http://truffleframework.com/docs/advanced/configuration
   compilers: {
     solc: {
       version: "^0.6.0",
