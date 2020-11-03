@@ -33,4 +33,4 @@ packer_cache/
 .wafpickle-N
 
 # build outputs of Remix-IDE for smart contracts - https://remix-ide.readthedocs.io/en/latest/contract_metadata.html
-contracts/**/artifacts/*.*
+contracts/**/artifacts/
