@@ -4,7 +4,7 @@
 #   - Check the availability of the TCP port for Linux
 #   - Setup 'logrotate' for Linux
 
-readonly verbose=0  # 1: true, 0: false - Hard coded yet
+readonly verbose=1  # 1: true, 0: false - Hard coded yet
 readonly dryrun=0   # 1: true, 0: false - Not Used Yet
 readonly uname=`uname -s`  # OS type
 readonly script_dir=$(cd `dirname $0` && pwd)
@@ -94,13 +94,16 @@ readonly eth_host=`cat ganache-cli.properties | grep -E "^ethereum\.host=" | sed
 readonly eth_port=`cat ganache-cli.properties | grep -E "^ethereum\.port=" | sed -E 's/ethereum\.port=//'`
 readonly eth_gas_price=`cat ganache-cli.properties | grep -E "^ethereum\.gasPrice=" | sed -E 's/ethereum\.gasPrice=//'`
 readonly eth_gas_limit=`cat ganache-cli.properties | grep -E "^ethereum\.gasLimit=" | sed -E 's/ethereum\.gasLimit=//'`
+readonly eth_keys=`cat ganache-cli.properties | grep -E "^ethereum\.keys" | sed -E 's/ethereum\.keys\.[0-9]*=//'`
 
 if [ $verbose -ne 0 ]; then
-  echo "eth_ver: $eth_ver"
-  echo "eth_host: $eth_host"
-  echo "eth_port: $eth_port"
-  echo "eth_gas_price: $eth_gas_price"
-  echo "eth_gas_limit: $eth_gas_limit"
+  echo "Ethereum Network ID : $eth_ver"
+  echo "Ethereum Client Host Address: $eth_host"
+  echo "Ethereum Client TCP Port: $eth_port"
+  echo "Ethereum Gas Limit: $eth_gas_limit"
+  echo "Ethereum Gas Price: $eth_gas_price"
+  echo "Ethereum Private Keys for Accounts: "
+  for key in $eth_keys; do echo "    $key"; done
   echo "uname: $uname"
 fi
 
@@ -140,13 +143,21 @@ cmd="ganache-cli --networkId $eth_ver \
             --gasPrice $eth_gas_price \
             --gasLimit $eth_gas_limit"
 
-if [ -z "$BIP39_MNEMONIC" ]; then
-  echo "'BIP39_MNEMONIC' env. variable is not defined, so implicit default mnemonic will be used."
-  echo "If you want to use user defined mnemonic, define it via 'BIP39_MNEMONIC' env. variable and restart this script."
-  cmd="${cmd} --deterministic"
+if [ -n "$eth_keys" ]; then
+  echo ""
+  echo "Private keys for Ethereum accounts are explicitly specified. They will be used."
+  for key in $eth_keys;
+    do cmd="${cmd} --account=\"${key},10000\""
+  done;
 else
-  echo "'BIP39_MNEMONIC' env. variable is defined, so it will be used."
-  cmd="${cmd} --mnemonic '$BIP39_MNEMONIC'"
+  if [ -z "$BIP39_MNEMONIC" ]; then
+    echo "'BIP39_MNEMONIC' env. variable is not defined, so implicit default mnemonic will be used."
+    echo "If you want to use user defined mnemonic, define it via 'BIP39_MNEMONIC' env. variable and restart this script."
+    cmd="${cmd} --deterministic"
+  else
+    echo "'BIP39_MNEMONIC' env. variable is defined, so it will be used."
+    cmd="${cmd} --mnemonic '$BIP39_MNEMONIC'"
+  fi
 fi
 
 cmd="${cmd} --defaultBalanceEther 10000 \
