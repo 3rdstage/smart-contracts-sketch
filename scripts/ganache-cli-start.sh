@@ -147,7 +147,7 @@ if [ -n "$eth_keys" ]; then
   echo ""
   echo "Private keys for Ethereum accounts are explicitly specified. They will be used."
   for key in $eth_keys;
-    do cmd="${cmd} --account=\"${key},10000\""
+    do cmd="${cmd} --account=\"${key},10000000000000000000000\""
   done;
 else
   if [ -z "$BIP39_MNEMONIC" ]; then
@@ -158,11 +158,10 @@ else
     echo "'BIP39_MNEMONIC' env. variable is defined, so it will be used."
     cmd="${cmd} --mnemonic '$BIP39_MNEMONIC'"
   fi
+  cmd="${cmd} --defaultBalanceEther 10000 --accounts 10 --secure"
 fi
 
-cmd="${cmd} --defaultBalanceEther 10000 \
-            --accounts 10 --secure \
-            --unlock 0 --unlock 1 --unlock 2 --unlock 3 --unlock 4 \
+cmd="${cmd} --unlock 0 --unlock 1 --unlock 2 --unlock 3 --unlock 4 \
             --hardfork 'petersburg' \
             --blockTime 0 \
             --db '${data_dir}' >> '${log_dir}'/ganache.log 2>&1"

@@ -1,6 +1,7 @@
 // https://github.com/trufflesuite/truffle/tree/v5.1.5/packages/hdwallet-provider
 // https://iancoleman.io/bip39/
 const HDWalletProvider = require("@truffle/hdwallet-provider");
+const Web3HttpProvider = require('web3-providers-http');
 
 // Read properties for local standalone Ganache CLI node
 const fs = require('fs');
@@ -12,10 +13,23 @@ const ganache = {
   websocket: false
 }
 
+const httpOptions = {
+  base: { keepAlive: true, timeout: 70000 }
+  
+}
+
 // http://truffleframework.com/docs/advanced/configuration
 module.exports = {
 
   networks: {
+    
+    // https://www.trufflesuite.com/docs/truffle/reference/choosing-an-ethereum-client#truffle-develop
+    builtin: {    // truffle built-in client : aka `truffle develop`
+      host: '127.0.0.1',
+      port: 9545,
+      network_id: "*"
+    },
+    
     development: {
       host: ganache.host,
       port: ganache.port,
@@ -62,15 +76,17 @@ module.exports = {
   },
 
   // http://truffleframework.com/docs/advanced/configuration
+  // https://solidity.readthedocs.io/en/v0.6.6/using-the-compiler.html#target-options
   compilers: {
     solc: {
       version: "^0.6.0",
+      //parser: "solcjs",
       settings: {
         optimizer: {
           enabled: false,
           runs: 200
         },
-        evmVersion: "petersburg"
+        evmVersion: "istanbul"  // berlin, istanbul, petersburg, constantinople, byzantium
       }
     },
   },

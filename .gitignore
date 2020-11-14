@@ -34,3 +34,11 @@ packer_cache/
 
 # build outputs of Remix-IDE for smart contracts - https://remix-ide.readthedocs.io/en/latest/contract_metadata.html
 contracts/**/artifacts/
+
+# don't ignore OpenZeppelin contracts
+# !/node_modules/@openzeppelin/
+# /node_modules/@openzeppelin/*
+# !/node_modules/@openzeppelin/contracts/
+# /node_modules/@openzeppelin/contracts/build
+# /node_modules/@openzeppelin/contracts/package.json
+# /node_modules/@openzeppelin/contracts/**/artifacts
