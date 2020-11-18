@@ -79,7 +79,7 @@ module.exports = {
   // https://solidity.readthedocs.io/en/v0.6.6/using-the-compiler.html#target-options
   compilers: {
     solc: {
-      version: "^0.6.0",
+      version: "0.6.12",
       //parser: "solcjs",
       settings: {
         optimizer: {
