@@ -12,6 +12,13 @@ const Votes = artifacts.require("VotesL");
 module.exports = async function (deployer, network, accounts) {
   'use strict';
   
+  const minAccts = 10;
+  if(accounts.length < minAccts){
+    console.error(`At least ${minAccts} accounts are necessary. But currently only ${accounts.length} accounts are prepared.`);
+    console.error(`Try again with more accounts.`);
+    console.error();
+    process.exit(100);
+  }
   
   console.debug('Starting to deploy 8 contracts');
   const startAt = Date.now();
@@ -48,12 +55,12 @@ module.exports = async function (deployer, network, accounts) {
   const vts = await Votes.deployed();
   await prjMgr.setVotesContact(Votes.address);
   
-//  console.debug("Mining initial balances to 3 voters");
-//  const voterIndexes = [6, 7, 8];
-//  const voterInitBal = web3.utils.toBN(10E18);
-//  for(const i of voterIndexes){
-//    await tkn.mint(accounts[i], voterInitBal, options);
-//  }
+  console.debug("Mining initial balances to 3 voters");
+  const voterIndexes = [6, 7, 8];
+  const voterInitBal = web3.utils.toBN(10E18);
+  for(const i of voterIndexes){
+    await tkn.mint(accounts[i], voterInitBal, options);
+  }
   
   const mdlCnt = await prjMgr.getNumberOfRewardModels();
   console.debug(`Number of registered reward models: ${mdlCnt}`);
