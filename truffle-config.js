@@ -1,7 +1,9 @@
 // https://github.com/trufflesuite/truffle/tree/v5.1.5/packages/hdwallet-provider
+// https://web3js.readthedocs.io/en/v1.3.0/web3.html#providers
 // https://iancoleman.io/bip39/
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const Web3HttpProvider = require('web3-providers-http');
+const Web3WsProvider = require('web3-providers-ws');
 
 // Read properties for local standalone Ganache CLI node
 const fs = require('fs');
@@ -13,12 +15,30 @@ const ganache = {
   websocket: false
 }
 
+// https://www.npmjs.com/package/web3-providers-http
 const httpOptions = {
-  base: { keepAlive: true, timeout: 70000 }
-  
+  keepAlive: true, timeout: 70000
 }
 
+// https://www.npmjs.com/package/web3-providers-ws
+const wsOptions = {
+  timeout: 600000,
+
+  clientConfig: {
+    maxReceivedFrameSize: 100000000,
+    maxReceivedMessageSize: 100000000,
+
+    keepalive: true,
+    keepaliveInterval: 60000,
+  },
+
+  reconnect: { auto: true, delay: 5000, maxAttempts: 5, onTimeout: false }
+}
+
+
 // http://truffleframework.com/docs/advanced/configuration
+// https://infura.io/docs/gettingStarted/chooseaNetwork
+// https://ethereum.stackexchange.com/questions/27048/comparison-of-the-different-testnets
 module.exports = {
 
   networks: {
@@ -39,16 +59,18 @@ module.exports = {
       websockets: ganache.websocket
     },
 
+    //Ropsten : PoW
     //GitHub : https://github.com/ethereum/ropsten/
     //Explorer : https://ropsten.etherscan.io/
     //Faucet : https://faucet.ropsten.be/
     ropsten: {
-      provider: () => new HDWalletProvider(process.env.BIP39_MNEMONIC,"https://ropsten.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
+      provider: () => new HDWalletProvider(process.env.BIP39_MNEMONIC, "https://ropsten.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
       network_id: '3',
       gas: 7E6,
       gasPrice: 1E10
     },
 
+    //Rinkeby : PoA
     //Explorer : https://rinkeby.etherscan.io/
     //Faucet : https://faucet.rinkeby.io/
     rinkeby: {
@@ -56,14 +78,34 @@ module.exports = {
       network_id: '4',
     },
 
+    //Kovan : PoA
     //GitHub : https://github.com/kovan-testnet/
     //Explorer : https://kovan.etherscan.io/
-    //Faucet : https://faucet.kovan.network/
+    //Faucet : https://github.com/kovan-testnet/faucet
     kovan: {
-      provider: () => new HDWalletProvider(process.env.BIP39_MNEMONIC, "https://kovan.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
+      provider: () => 
+        new HDWalletProvider({
+          mnemonic: process.env.BIP39_MNEMONIC,
+          providerOrUrl: new Web3HttpProvider("https://kovan.infura.io/v3/" + process.env.INFURA_PROJECT_ID, httpOptions),
+          pollingInterval: 2000
+        }),
       network_id: '42', //https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
-      gas: 7E6,
-      gasPrice: 5E10
+      //gas: 7E6,
+      //gasPrice: 5E10
+    },
+    
+    kovan_ws: {
+      provider: () => 
+        new HDWalletProvider({
+          mnemonic: process.env.BIP39_MNEMONIC,
+          providerOrUrl: new Web3WsProvider("wss://kovan.infura.io/ws/v3/" + process.env.INFURA_PROJECT_ID, wsOptions),
+          pollingInterval: 2000
+        }),
+      network_id: '42', //https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
+      websockets: true, 
+      //gas: 7E6,
+      //gasPrice: 5E10
+
     }
   },
 

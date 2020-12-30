@@ -38,7 +38,7 @@ module.exports = async function (deployer, network, accounts) {
 
   console.debug("Granting token minter role to project manager")
   const tkn = await RegularERC20Token.deployed();
-  await tkn.grantRole(await tkn.MINTER_ROLE(), ProjectManager.address);
+  await tkn.grantRole(await tkn.MINTER_ROLE(), ProjectManager.address, options);
   console.debug("Registering 3 reward models to project manager");
   const mdlAddrs = [
       ProportionalRewardModel.address, 
@@ -53,7 +53,7 @@ module.exports = async function (deployer, network, accounts) {
   
   await deployer.deploy(Votes, ProjectManager.address, Contributions.address, options);
   const vts = await Votes.deployed();
-  await prjMgr.setVotesContact(Votes.address);
+  await prjMgr.setVotesContact(Votes.address, options);
   
   console.debug("Mining initial balances to 3 voters");
   const voterIndexes = [6, 7, 8];
