@@ -32,7 +32,7 @@ Darwin*) #Bash on macOS
 esac
 
 
-# check whether GNU getopt is available or not
+# Check whether GNU getopt is available or not
 if [ `getopt --test; echo $?` -ne 4 ]; then
   echo "The avaiable 'getopt' is not GNU getopt which supports long options."
   echo "For MacOS, install 'gnu-getopt' refering 'https://formulae.brew.sh/formula/gnu-getopt'."

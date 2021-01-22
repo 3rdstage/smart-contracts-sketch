@@ -1,0 +1,16 @@
+# https://besu.hyperledger.org/en/stable/Reference/CLI/CLI-Syntax/
+# https://besu.hyperledger.org/en/stable/HowTo/Configure/Using-Configuration-File/
+# 
+
+# Working
+miner-coinbase="0xb009cd53957c0D991CAbE184e884258a1D7b77D9"
+
+# Access Control
+rpc-http-port=8545
+rpc-http-cors-origins=["*"]
+host-allowlist=["*"]
+rpc-http-enabled=true
+rpc-ws-enabled=false
+
+# Logging - OFF | FATAL | ERROR | WARN | INFO | DEBUG | TRACE | ALL
+logging="INFO"
