@@ -40,6 +40,8 @@ const wsOptions = {
 // https://infura.io/docs/gettingStarted/chooseaNetwork
 // https://ethereum.stackexchange.com/questions/27048/comparison-of-the-different-testnets
 module.exports = {
+  
+  contracts_build_directory: "./build/truffle",  // default: ./build/contracts
 
   networks: {
     
@@ -57,6 +59,11 @@ module.exports = {
       gas: 3E8,
       gasPrice: 0,
       websockets: ganache.websocket
+    },
+    
+    mainnet: {
+      provider: () => new HDWalletProvider(process.env.BIP39_MNEMONIC, "https://mainnet.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
+      network_id: '1'      
     },
 
     //Ropsten : PoW
