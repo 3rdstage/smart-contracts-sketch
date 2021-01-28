@@ -191,7 +191,7 @@ else
 
   if [ $? -eq 0 ]; then
     sleep 3
-    tail "${log_dir}"/ganache.log -n 50
+    tail -n 50 "${log_dir}"/ganache.log
     echo "The loacal Ganache has started."
     echo "The log file is located at '${log_dir}/ganache.log'."
   fi
