@@ -24,12 +24,14 @@ npm-debug.log
 .npmrc
 __pycache__
 packer_cache/
-/**/*.log
-/**/*.bak
-/**/.~*
-/**/._*
-/**/.cache*
-/**/.*.swp
+.DS_Store
+*.log
+*.bak
+.~*
+._*
+.cache*
+.*.swp
+*.md.html
 .lock-wscript
 .wafpickle-N
 
