@@ -15,3 +15,6 @@
 
 * Oracle Service
 * Encoded data field
+* eWASM
+* Vault for `secp256k1` ECDSA
+* Digital Certificates and Ethereum
