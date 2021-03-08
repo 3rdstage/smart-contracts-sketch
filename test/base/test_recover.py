@@ -20,11 +20,15 @@ def test_hello():
 #   - EIP-191 Signed Data Standard : https://eips.ethereum.org/EIPS/eip-191  
 def test_recover_pubkey(accounts, web3):
   
+  
+  # private key of accounts[0] - configured to local ganache-cli
   prvkey = keys.PrivateKey(bytes.fromhex(
     '0x052fdb8f5af8f2e4ef5c935bcacf1338ad0d8abe30f45f0137943ac72f1bba1e'[2::]))
   print(f'privat key : {prvkey.to_hex()}')
   print(f'public key : {prvkey.public_key.to_hex()}')
   print(f'address    : {prvkey.public_key.to_address()}')
+  
+  assert prvkey.public_key.to_address().upper() == accounts[0].address.upper()
   
   msg = 'We built this city.'
   sig = web3.eth.sign(accounts[0].address, text=msg) # HexBytes
@@ -40,6 +44,7 @@ def test_recover_pubkey(accounts, web3):
   # EIP-191 (https://eips.ethereum.org/EIPS/eip-191) defines preproessing 
   #         on original message before appyling standard signing of ECDSA.
   msg_191 = keccak(text='\x19Ethereum Signed Message:\n' + str(len(msg)) + msg)
+  print(f'EIP-191 applied message : {"0x" + msg_191.hex()}')
   sig_std = to_standard_signature_bytes(sig)
   
   # recovering public key of secp256k1 keypair using `eth_keys` package
