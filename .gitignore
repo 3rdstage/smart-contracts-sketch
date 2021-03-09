@@ -1,6 +1,18 @@
+# references
+#   https://git-scm.com/docs/gitignore
+#   https://github.com/github/gitignore
+
+# source version control related
 CVS/
 .svn/
+.hg
+
+# IDEs or tools related
 /.idea/
+/.vscode/
+.gradle/
+
+# directories for intermediate or final compiled artifacts
 /bin/
 /target/
 /build/
@@ -10,28 +22,44 @@ CVS/
 /x86/
 /x64/
 /obj/
+
+# dependencies
 /node_modules/
 /pkg/
+
+# generated artifacts
+/reports/
+/_site/
+.apt_generated/
+.atp_generated_tests/
+
+# runtime outputs
 /run/
 /log/
 /logs/
 /test-output/
-/reports/
-.apt_generated/
-package-lock.json
-config.gypi
-npm-debug.log
-.npmrc
-__pycache__
-packer_cache/
-.DS_Store
 *.log
-*.bak
+npm-debug.log
+
+# backups, caches, or temporary artifacts
 .~*
 ._*
+*.bak
 .cache*
 .*.swp
 *.md.html
+package-lock.json
+Gemfile.lock
+.sass-cache
+__pycache__/
+.pytest_cache/
+packer_cache/
+
+# misc
+config.gypi
+.npmrc
+.jekyll-metadata
+.DS_Store
 .lock-wscript
 .wafpickle-N
 
