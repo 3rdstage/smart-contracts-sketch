@@ -128,7 +128,7 @@ module.exports = {
   // https://solidity.readthedocs.io/en/v0.6.6/using-the-compiler.html#target-options
   compilers: {
     solc: {
-      version: "0.6.12",
+      version: "pragma",  // https://github.com/trufflesuite/truffle/releases/tag/v5.2.0
       //parser: "solcjs",
       settings: {
         optimizer: {

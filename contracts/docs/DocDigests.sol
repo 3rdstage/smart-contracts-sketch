@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.6.0;
-pragma experimental ABIEncoderV2;
-
+pragma abicoder v2;
+pragma solidity ^0.7.0;
 
 struct DocDigest{
     
@@ -9,7 +8,9 @@ struct DocDigest{
     string algorithm;
     string title;
     string format;
-   
+    string filename;
+    string url;
+       
     address provider;
     
 }
@@ -17,10 +18,17 @@ struct DocDigest{
 contract DocDigests {
     
     // main storage, `doc-id::uint256` -> `doc-digest`
-    mapping(uint256 => DocDigest) private digests;
+    mapping(uint256 => DocDigest) private docs;
     
     // index storage, `doc-provider` -> `doc-id[]`
     mapping(address => uint256[]) private docsByProvider;
+    
+    
+    
+    function addDoc(DocDigest memory doc) public{
+          
+    }
+    
     
     
     
