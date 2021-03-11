@@ -23,7 +23,7 @@ compiler:
   stop_after: 'parsing'
   evm_version: 'istanbul'
   solc:
-    version: '0.6.12'
+    # version: '0.7.1'
     optimizer:
       enabled: false
       runs: 200
