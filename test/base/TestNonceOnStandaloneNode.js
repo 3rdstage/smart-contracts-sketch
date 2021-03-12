@@ -30,7 +30,7 @@ contract("Test nonce increments for an address in a single/standalone node.", as
       await web3.eth.sendTransaction({from: acct1, to: acct2, value: amt});
       const nc11 = await web3.eth.getTransactionCount(acct1); // nonce for sender after tx.    
     
-      console.log(`nonces for sender before/after tx : ${nc10}/${nc11}, gap : ${nc11 - nc10}`);
+      console.log(`Sender's nonce before/after tx : ${nc10}/${nc11}, gap : ${nc11 - nc10}`);
     }
     
     const acct1 = accounts[0];
@@ -64,7 +64,7 @@ contract("Test nonce increments for an address in a single/standalone node.", as
     }
     
     nc = await web3.eth.getTransactionCount(acct1);
-    console.log(`Sender's nonce right after ${n} transactions are mined : ${nc}`);
+    console.log(`Sender's nonce after ${n} transactions are mined : ${nc}`);
   })  
   
 })
