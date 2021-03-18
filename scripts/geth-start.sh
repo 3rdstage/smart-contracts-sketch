@@ -103,6 +103,12 @@ if [ ! -f "${data_dir}/geth/nodekey" ]; then  # not initialized
   echo ""
   echo "Creating genesys state."
   geth  --datadir "${data_dir}" init "${script_dir}/geth-genesis.json"
+  
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "Fail to create genesis block."
+    exit 200
+  fi
 fi
 
 echo ""
