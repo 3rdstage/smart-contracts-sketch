@@ -1,0 +1,65 @@
+* -text
+
+*.tag -text
+*.MF -text
+*.aj -text
+*.ftl -text
+*.mediawiki -text
+*.textile -text
+*.q -text
+*.g -text
+*.tokens -text
+*.script -text
+*.cfg -text
+.classpath -text
+.project -text
+.jsdtscope -text
+*.prefs -text
+*.component -text
+*.launch -text
+.springBeans -text
+.euml2 -text
+.umlproject -text
+.clay -text
+.fbprefs -text
+.pmd -text
+.lint4jprefs -text
+.jshintrc -text
+
+*.sol linguist-language=Solidity
+
+# Declare files that will always have CRLF line endings on checkout.
+*.sln text eol=crlf
+
+# Denote all files that are truly binary and should not be modified.
+*.a binary
+*.o binary
+*.so binary
+*.lib binary
+*.com binary
+*.exe binary
+*.dll binary
+*.bin binary
+*.zip binary
+*.7z binary
+*.png binary
+*.jpeg binary
+*.jpg binary
+*.gif binary
+*.bmp binary
+*.tif binary
+*.tiff binary
+*.mp3 binary
+*.mp4 binary
+*.avi binary
+*.flv binary
+*.ico binary
+*.class binary
+*.jar binary
+*.doc binary
+*.docx binary
+*.xls binary
+*.xlsx binary
+*.ppt binary
+*.pptx binary
+*.pdf binary
