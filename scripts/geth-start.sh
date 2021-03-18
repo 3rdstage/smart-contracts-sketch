@@ -103,20 +103,17 @@ if [ ! -f "${data_dir}/geth/nodekey" ]; then  # not initialized
   echo ""
   echo "Creating genesys state."
   geth  --datadir "${data_dir}" init "${script_dir}/geth-genesis.json"
-  echo ""
-  echo "Adding a few accounts into the node."
-  geth js --nodiscover --datadir "${data_dir}" "${script_dir}/geth-setup.js"
 fi
 
 echo ""
 echo "Starting geth node of which log is located at '${log_dir}/geth.log'"
 # available http.api = admin,db,eth,debug,miner,net,shh,txpool,personal,web3
 cmd="geth --datadir '${data_dir}' --networkid 31 \
-          --nodiscover --verbosity 3 \
+          --nodiscover --maxpeers 0 --verbosity 3 \
+          --allow-insecure-unlock \
+          --preload '${script_dir}/geth-setup.js' \
           --http --http.addr localhost --http.port 8545 \
-          --mine --miner.threads 1 \
-          --miner.etherbase 0x3DC9b4063a130535913137E40Bed546Ff93b1131 \
-          >> '${log_dir}'/geth.log 2>&1"
+          console >> '${log_dir}/geth.log' 2>&1"
 
 if [ $backgrounds -eq 0 ]; then
   echo ""
@@ -132,6 +129,6 @@ else
     sleep 3
     tail "${log_dir}"/geth.log -n 50
     echo "The local standalone geth node has started."
-    echo "The log file is located at '${log_dir}'/geth.log'."
+    echo "The log file is located at '${log_dir}/geth.log'."
   fi
 fi
