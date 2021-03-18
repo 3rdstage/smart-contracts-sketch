@@ -1,7 +1,7 @@
 BuilderConfiguration.is_project_specific=true
 autobuilding=false
-com.yakindu.solidity.Solidity.useProjectSettings=true
 eclipse.preferences.version=1
+org.eclipse.papyrus.infra.gmfdiag.css3.CSS.useProjectSettings=true
 outlet.DEFAULT_OUTPUT.cleanDirectory=false
 outlet.DEFAULT_OUTPUT.cleanupDerived=true
 outlet.DEFAULT_OUTPUT.createDirectory=false

@@ -25,7 +25,7 @@ if (accts.length == 0){
 }
 
 for(var i = 0; i < accts.length; i++){
-  personal.unlockAccount(accts[i], passphrase);
+  personal.unlockAccount(accts[i], passphrase, 0);
 }
 console.log('Successfully unlocked ', accts.length, ' accounts');
 
