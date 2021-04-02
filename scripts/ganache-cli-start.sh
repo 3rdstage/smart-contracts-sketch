@@ -95,7 +95,9 @@ readonly eth_port=`cat ganache-cli.properties | grep -E "^ethereum\.port=" | sed
 readonly eth_gas_price=`cat ganache-cli.properties | grep -E "^ethereum\.gasPrice=" | sed -E 's/ethereum\.gasPrice=//'`
 readonly eth_gas_limit=`cat ganache-cli.properties | grep -E "^ethereum\.gasLimit=" | sed -E 's/ethereum\.gasLimit=//'`
 readonly eth_block_time=`cat ganache-cli.properties | grep -E "^ethereum\.blockTime=" | sed -E 's/ethereum\.blockTime=//'`
+readonly eth_hardfork=`cat ganache-cli.properties | grep -E "^ethereum\.hardfork" | sed -E 's/ethereum\.hardfork=//'`
 readonly eth_keys=`cat ganache-cli.properties | grep -E "^ethereum\.keys" | sed -E 's/ethereum\.keys\.[0-9]*=//'`
+
 
 if [ $verbose -ne 0 ]; then
   echo "Ethereum Network ID : $eth_ver"
@@ -163,7 +165,7 @@ else
 fi
 
 cmd="${cmd} --unlock 0 --unlock 1 --unlock 2 --unlock 3 --unlock 4 \
-            --hardfork 'petersburg' \
+            --hardfork $eth_hardfork \
             --blockTime $eth_block_time \
             --db '${data_dir}' >> '${log_dir}'/ganache.log 2>&1"
 
@@ -184,11 +186,6 @@ if [ $backgrounds -eq 0 ]; then
   echo ""
   echo $cmd
   eval $cmd
-else
-  cmd=$cmd' &'
-  echo ""
-  echo $cmd
-  eval $cmd
 
   if [ $? -eq 0 ]; then
     sleep 3
@@ -196,6 +193,10 @@ else
     echo "The loacal Ganache has started."
     echo "The log file is located at '${log_dir}/ganache.log'."
   fi
+
+else
+  cmd=$cmd' &'
+  echo ""
+  echo $cmd
+  eval $cmd
 fi
-
-

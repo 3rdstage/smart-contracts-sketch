@@ -5,7 +5,7 @@ project_structure:
     contracts: contracts
     reports: reports
     scripts: scripts/brownie
-    tests: tests
+    tests: test   # for compatibility with truffle
 
 networks:
   default: development
