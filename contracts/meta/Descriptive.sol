@@ -7,11 +7,11 @@ import "../../node_modules/@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../../node_modules/@openzeppelin/contracts/math/Math.sol";
 
 
+// org.springframework.http.HttpHeaders API : https://docs.spring.io/spring-framework/docs/5.1.x/javadoc-api/index.html?org/springframework/http/HttpHeaders.html
+
 struct Attribute{
-    
     string name;
     string value;
-        
 }
 
 
@@ -21,6 +21,7 @@ contract Descriptive{
 
     Attribute[] private attribs;
     mapping(string => EnumerableSet.UintSet) private attribsByName; // attrib name => attribs
+    
     
 
     string private name;
@@ -35,7 +36,15 @@ contract Descriptive{
         name = _name;
     }
     
-    function getAttribute(string memory _name) public view returns (string[] memory){
+    function getAttribute(string memory _name) public view returns (string memory){
+        uint n = attribsByName[_name].length();
+        string memory val;
+        if(n > 0) val = attribs[attribsByName[_name].at(0)].value;
+        
+        return val;
+    }
+    
+    function getAttributes(string memory _name) public view returns (string[] memory){
 
         uint n = attribsByName[_name].length();
         string[] memory vals = new string[](n);
@@ -63,9 +72,21 @@ contract Descriptive{
     
     function addAttribute(string memory _name, string memory _value) public{
 
-
+    }
+    
+    function getAttributeNames() public view returns (string[] memory){
         
     }
+    
+    function removeAttribute(string memory _name, string memory _value) public{
+        
+    }
+    
+    function removeAttributes(string memory _name) public{
+        
+    }
+    
+    
 
     
 }
