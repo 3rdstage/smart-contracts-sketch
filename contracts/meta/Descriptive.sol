@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma experimental ABIEncoderV2;
 pragma solidity >=0.6.0 <0.8.0;
-
+pragma experimental ABIEncoderV2;
 
 import "../../node_modules/@openzeppelin/contracts/utils/EnumerableSet.sol";
 import "../../node_modules/@openzeppelin/contracts/math/Math.sol";
@@ -23,6 +22,8 @@ contract Descriptive{
     Attribute[] private _attribs;
     mapping(string => EnumerableSet.UintSet) private _idxsByName; // attrib name => attrib indexes
     EnumerableSet.UintSet private _firstIdxs;  // attrib indexes on first values for each name
+
+    string[2] private aliases;
 
     string private _name;
     
@@ -67,21 +68,24 @@ contract Descriptive{
 
         delete _idxsByName[name];
 
-        uint n = _attribs.length;
-        _attribs.push(Attribute(name, value));
-        _idxsByName[name].add(n);
-        _firstIdxs.add(n);
-
-        emit AttributeSet(name, value, n);
+        _addAttribute(name, value);
     }
     
     function addAttribute(string memory name, string memory value) public{
+        _addAttribute(name, value);
+    }
+    
+    function _addAttribute(string memory name, string memory value) internal{
         uint n = _attribs.length;
         _attribs.push(Attribute(name, value));
         _idxsByName[name].add(n);
-        if(_idxsByName[name].length() == 1) _firstIdxs.add(n);
+        if(_idxsByName[name].length() == 1){
+          _firstIdxs.add(n);
+          emit AttributeSet(name, value, n);
+        }else{
+          emit AttributeAdded(name, value, _idxsByName[name].length(), n);
+        } 
         
-        emit AttributeAdded(name, value, _idxsByName[name].length(), n);
     }
     
     function getAttributeNames() public view returns (string[] memory){
@@ -120,8 +124,19 @@ contract Descriptive{
         
     }
     
-    function removeAttributes(string memory _name) public{
+    function removeAttributes(string memory name) public{
+        uint m = _idxsByName[name].length();
         
+        if(m == 0) return;
+        
+        uint idx;
+        for(uint i = 0; i < m; i++){
+            idx = _idxsByName[name].at(i);
+            delete _attribs[idx];
+            _idxsByName[name].remove(idx);
+            _firstIdxs.remove(idx);
+        }
+
     }
 
 }

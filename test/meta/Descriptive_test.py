@@ -29,6 +29,8 @@ def test_inital_state(testee):
   for i in range(0, 5):
     key = random.choice(KEYS)
     assert testee.getAttribute(key) == ''
+    
+  
   
 
 def test_set_attribute(testee):
