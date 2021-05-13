@@ -11,11 +11,6 @@
 			</arguments>
 		</buildCommand>
 		<buildCommand>
-			<name>org.eclipse.xtext.ui.shared.xtextBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-		<buildCommand>
 			<name>org.eclipse.wst.validation.validationbuilder</name>
 			<arguments>
 			</arguments>
@@ -23,12 +18,11 @@
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
-		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
 		<nature>org.python.pydev.pythonNature</nature>
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1615545764757</id>
+			<id>1620888181273</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -37,7 +31,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1615545764759</id>
+			<id>1620888181275</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -46,7 +40,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1615545764761</id>
+			<id>1620888181277</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -55,12 +49,21 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1615545764764</id>
+			<id>1620888181287</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-projectRelativePath-matches-false-false-run/geth/data</arguments>
+			</matcher>
+		</filter>
+		<filter>
+			<id>1620888181289</id>
+			<name></name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-true-contracts/(.*/)?artifacts</arguments>
 			</matcher>
 		</filter>
 	</filteredResources>
