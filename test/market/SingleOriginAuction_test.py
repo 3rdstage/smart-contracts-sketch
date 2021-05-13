@@ -16,13 +16,16 @@ def deployer():
 
 
 @pytest.fixture
-def testee(deployer):
-  return deployer.deploy(SingleOriginAuction)
+def erc721(deployer):
+  return deployer.deploy(ERC721Mock, 'Card NFT', 'ABC', '')
 
+@pytest.fixture
+def testee(deployer, erc721):
+  return deployer.deploy(SingleOriginAuction, erc721.address)
 
 
 def test_initial_state(testee):
-  n = testee.findAllOpenOffersCount()
+  n = testee.getAllOpenOffersCount()
   
   assert n == 0;
 
