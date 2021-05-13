@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.6.0 <0.8.0;
-pragma experimental ABIEncoderV2;
+//pragma experimental ABIEncoderV2;
 
 
 interface IPagedListHolder {
@@ -11,6 +11,8 @@ interface IPagedListHolder {
     
     function setDefaultPageSize(uint256 size) external; 
     
-    function getPageCount() external view returns(uint256);
+    function getDefaultPageSize() external view returns(uint256);
+    
+    function isAllowedPageSize(uint256 size) external view returns(bool); 
 
 }

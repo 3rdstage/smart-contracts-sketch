@@ -12,6 +12,24 @@
 
 
 
+
 ### Considerations
 
-* 
+* Offer closing 
+    * How to implement
+    
+* Scheduled offer opening
+    * `offer(uint256 assetId, uint256 lowestPrice, uint256 openAt, uint256 closeAt)
+    
+* The scope of offerer
+    * the owner, the approved (delegated), the operator (delegated)
+ 
+* The scope of bidder
+    * 
+ 
+
+* The scope of private auction - Contract, Offer
+    * Private Auction Contract
+    * Private Offer
+    
+    

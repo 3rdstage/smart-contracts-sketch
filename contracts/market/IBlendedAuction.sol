@@ -8,7 +8,7 @@ struct Offer{
     address tokenContract;
     uint256 assetId;
     address seller;
-    uint256 lowerPrice;
+    uint256 lowestPrice;
     uint256 closedAt;
     bool isWithdrawn;
     bool isOpen;
