@@ -43,6 +43,10 @@ contract SingleOriginAuction is ISingleOriginAuction, PagedListHolder(10){
         //@TODO How to check EIP-721 compliance for the specified asset contract
         _assetContract = assetContr;
     }
+    
+    function getAssetContractAddress() external override returns(address){
+        return _assetContract;
+    }
 
     function offer(uint256 assetId, uint256 lowestPrice, uint256 closeAt) external override returns(uint256){
 
@@ -61,6 +65,7 @@ contract SingleOriginAuction is ISingleOriginAuction, PagedListHolder(10){
         _openAssetIds.add(assetId);
         _openOfferByAsset[assetId] = id;
         
+        emit OfferMade(id, offerer, assetId, lowestPrice, closeAt);
         return id;
     }
     
@@ -143,6 +148,9 @@ contract SingleOriginAuction is ISingleOriginAuction, PagedListHolder(10){
 
     }
     
+    function findOffer(uint256 offerId) external view override returns(Offer memory){
+        return _offers[offerId];
+    }
     
     function findOffers(uint256[] memory offerIds) external view override returns(Offer[] memory offers){
         //@TODO    
