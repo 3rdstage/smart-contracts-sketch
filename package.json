@@ -15,6 +15,7 @@
   "contributors": [],
   "dependencies": {
     "@openzeppelin/contracts": "^3.4.1",
+    "@openzeppelin/contracts-4": "npm:@openzeppelin/contracts@^4.1.0",
     "@remix-project/remixd": "^0.3.2",
     "@truffle/hdwallet-provider": "^1.1.0",
     "elliptic": "6.5.4",
