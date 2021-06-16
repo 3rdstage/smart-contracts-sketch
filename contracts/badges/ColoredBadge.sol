@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.5;
-pragma experimental ABIEncoderV2; 
+//pragma experimental ABIEncoderV2; 
 
 
 import "../../node_modules/@openzeppelin/contracts-4/utils/math/Math.sol";
@@ -60,9 +60,25 @@ contract ColoredBadge is ERC721PresetMinterPauserAutoId{
     function setTokenColor(uint256 tokenId, string memory color, uint8 score) public{
         
         // @TODO Needs priviledge control
-
         require(score < 101, "Max for score is 100");
+        _setTokenColor(tokenId, color, score);
+
+    }
+
+    function setTokenColors(uint256 tokenId, ColorFacet[] memory colors) public{
+
         ownerOf(tokenId); // check existence
+        
+        uint256 n = colors.length;
+        require(n > 0, "No color specified.");
+        for(uint256 i = 0; i < n; i++){
+            require(colors[i].score < 101, "Max for score is 100");
+            _setTokenColor(tokenId, colors[i].name, colors[i].score);
+        }
+           
+    }
+    
+    function _setTokenColor(uint256 tokenId, string memory color, uint8 score) public{
         
         bytes32 key = bytes32(bytes(color));
         require(_colorKeys.contains(key), "Unrecognizable color");
@@ -70,10 +86,7 @@ contract ColoredBadge is ERC721PresetMinterPauserAutoId{
         _tokenColors[tokenId][key] = score;
         emit TokenColored(tokenId, color, score);
     }
-
-    function setTokenColors(uint256 tokenId, ColorFacet[] memory colors) public{
-        // @TODO   
-    }
+    
     
     function clearTokenColor(uint256 tokenId, string memory color) public{
         // @TODO
