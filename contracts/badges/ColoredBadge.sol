@@ -42,7 +42,7 @@ contract ColoredBadge is ERC721PresetMinterPauserAutoId{
         uint256 n = _colorKeys.length();
         string[] memory colors = new string[](n);
         for(uint256 i = 0; i < n; i++){
-            colors[i] = string(bytes.concat(_colorKeys.at(i)));
+            colors[i] = string(abi.encodePacked(_colorKeys.at(i)));
         }
 
         return colors;
