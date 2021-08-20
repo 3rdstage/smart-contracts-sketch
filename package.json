@@ -8,28 +8,28 @@
   ],
   "version": "0.1.0",
   "author": {
-    "name": "",
+    "name": "Sangmoon Oh",
     "email": "",
     "url": ""
   },
   "contributors": [],
   "dependencies": {
+    "solc": "^0.8.6",
+    "web3": "^1.5.0",
+    "web3-providers-http": "^1.5.0",
+    "web3-providers-ws": "^1.5.0",
     "@openzeppelin/contracts": "^3.4.1",
     "@openzeppelin/contracts-4": "npm:@openzeppelin/contracts@^4.2.0",
     "@remix-project/remixd": "^0.3.2",
     "@truffle/hdwallet-provider": "^1.4.2",
     "elliptic": "6.5.4",
     "eth-lib": "0.2.8",
-    "secp256k1": "4.0.2",
-    "solc": "^0.8.6",
-    "web3": "^1.5.0",
-    "web3-providers-http": "^1.5.0",
-    "web3-providers-ws": "^1.5.0"
+    "secp256k1": "4.0.2"
   },
   "devDependencies": {
+    "chance": "^1.1.7",
     "@openzeppelin/test-environment": "^0.1.9",
-    "@openzeppelin/test-helpers": "^0.5.12",
-    "chance": "^1.1.7"
+    "@openzeppelin/test-helpers": "^0.5.12"
   },
   "engines": {
     "node": ">=10.0"
