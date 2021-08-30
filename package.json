@@ -1,18 +1,27 @@
 {
-  "name": "smart-contracts",
+  "name": "@3rdstage/smart-contracts",
   "description": "Highly reliable and reusable smart contracts",
   "keywords": [
     "Smart Contract",
     "Ethereum",
     "Solidity"
   ],
-  "version": "0.1.0",
+  "version": "0.1.0-snapshot",
   "author": {
-    "name": "",
-    "email": "",
-    "url": ""
+    "name": "Sangmoon Oh",
+    "email": "halfface@chol.com",
+    "url": "https://3rdstage.fandom.com/"
   },
   "contributors": [],
+  "bundleDependencies": false,
+  "deprecated": false,
+  "files": [
+    "/contracts/**/*.sol",
+    "/build/truffle/*.json",
+    "!/mocks",
+    "!/examples"
+  ],
+  
   "dependencies": {
     "@openzeppelin/contracts": "^3.4.1",
     "@openzeppelin/contracts-4": "npm:@openzeppelin/contracts@^4.1.0",
