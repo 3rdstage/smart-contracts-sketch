@@ -11,7 +11,10 @@ struct Planet{
 
 contract Web3TestContract{
     
+    uint256 private _count = 0;
     
+    string private _memo;
+
     uint256[] private _fibonacciNumbers  = [0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229];
 
     string[] private _monthFullNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -22,7 +25,10 @@ contract Web3TestContract{
     
     Planet[] private _planets;
     
+    event CountUp(uint256 count);
     
+    event MemoUpdated(string memo);
+
     constructor(){
         _planets.push(Planet('Mercury',  2_440,    57_909_050, false));
         _planets.push(Planet('Venus',    6_052,   108_208_000, false));
@@ -119,6 +125,25 @@ contract Web3TestContract{
             plnts[i] = _planets[i + 5];
         }
         return plnts;
+    }
+    
+    
+    function countUp() public returns(uint256){
+        uint256 cnt = _count;
+        _count++;
+        
+        emit CountUp(cnt);
+        return cnt;
+    }
+    
+    function setMemo(string memory memo) public{
+        _memo = memo;
+        
+        emit MemoUpdated(memo);
+    }
+    
+    function getMemo() public view returns(string memory){
+        return _memo;
     }
 
 
