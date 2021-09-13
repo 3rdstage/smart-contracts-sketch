@@ -80,6 +80,7 @@ module.exports = {
     //Rinkeby : PoA
     //Explorer : https://rinkeby.etherscan.io/
     //Faucet : https://faucet.rinkeby.io/
+    //Avg. Block Time : 15s
     rinkeby: {
       provider: () => new HDWalletProvider(process.env.BIP39_MNEMONIC, "https://rinkeby.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
       network_id: '4',
@@ -89,6 +90,7 @@ module.exports = {
     //GitHub : https://github.com/kovan-testnet/
     //Explorer : https://kovan.etherscan.io/
     //Faucet : https://github.com/kovan-testnet/faucet
+    //Avg. Block Time : 4s
     kovan: {
       provider: () => 
         new HDWalletProvider({

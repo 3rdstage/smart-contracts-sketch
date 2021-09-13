@@ -62,6 +62,7 @@ config.gypi
 .DS_Store
 .lock-wscript
 .wafpickle-N
+/*.tgz
 
 # build outputs of Remix-IDE for smart contracts - https://remix-ide.readthedocs.io/en/latest/contract_metadata.html
 contracts/**/artifacts/
