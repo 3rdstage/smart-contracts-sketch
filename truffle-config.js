@@ -62,7 +62,9 @@ module.exports = {
     },
     
     mainnet: {
-      provider: () => new HDWalletProvider(process.env.BIP39_MNEMONIC, "https://mainnet.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
+      provider: () => new HDWalletProvider(
+        process.env.BIP39_MNEMONIC, 
+        "https://mainnet.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
       network_id: '1'      
     },
 
@@ -71,7 +73,9 @@ module.exports = {
     //Explorer : https://ropsten.etherscan.io/
     //Faucet : https://faucet.ropsten.be/
     ropsten: {
-      provider: () => new HDWalletProvider(process.env.BIP39_MNEMONIC, "https://ropsten.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
+      provider: () => new HDWalletProvider(
+        process.env.BIP39_MNEMONIC, 
+        "https://ropsten.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
       network_id: '3',
       gas: 7E6,
       gasPrice: 1E10
@@ -82,7 +86,9 @@ module.exports = {
     //Faucet : https://faucet.rinkeby.io/
     //Avg. Block Time : 15s
     rinkeby: {
-      provider: () => new HDWalletProvider(process.env.BIP39_MNEMONIC, "https://rinkeby.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
+      provider: () => new HDWalletProvider(
+        process.env.BIP39_MNEMONIC, 
+        "https://rinkeby.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
       network_id: '4',
     },
 
