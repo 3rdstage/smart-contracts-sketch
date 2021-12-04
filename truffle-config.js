@@ -1,5 +1,6 @@
 // https://github.com/trufflesuite/truffle/tree/v5.1.5/packages/hdwallet-provider
 // https://web3js.readthedocs.io/en/v1.3.0/web3.html#providers
+// https://infura.io/docs/ethereum#section/Choose-a-Network
 // https://iancoleman.io/bip39/
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 const Web3HttpProvider = require('web3-providers-http');
@@ -86,10 +87,28 @@ module.exports = {
     //Faucet : https://faucet.rinkeby.io/
     //Avg. Block Time : 15s
     rinkeby: {
-      provider: () => new HDWalletProvider(
-        process.env.BIP39_MNEMONIC, 
-        "https://rinkeby.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
+      provider: () => new HDWalletProvider({
+        mnemonic: process.env.BIP39_MNEMONIC, 
+        providerOrUrl: new Web3HttpProvider("https://rinkeby.infura.io/v3/" + process.env.INFURA_PROJECT_ID, httpOptions),
+        pollingInterval: 10000
+      }),
       network_id: '4',
+    },
+    
+    rinkeby_ws: {
+      provider: () => {
+        // Monkey patch to support `web3.eth.subscribe()` function
+        // https://github.com/trufflesuite/truffle/issues/2567
+        const wsProvider = new Web3WsProvider("wss://rinkeby.infura.io/ws/v3/" + process.env.INFURA_PROJECT_ID, wsOptions);
+        HDWalletProvider.prototype.on = wsProvider.on.bind(wsProvider);
+        return new HDWalletProvider({
+          mnemonic: process.env.BIP39_MNEMONIC,
+          providerOrUrl: wsProvider,
+          pollingInterval: 10000
+        });
+      },
+      network_id: '4', //https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
+      websockets: true, 
     },
 
     //Kovan : PoA
@@ -98,30 +117,76 @@ module.exports = {
     //Faucet : https://github.com/kovan-testnet/faucet
     //Avg. Block Time : 4s
     kovan: {
-      provider: () => 
-        new HDWalletProvider({
-          mnemonic: process.env.BIP39_MNEMONIC,
-          providerOrUrl: new Web3HttpProvider("https://kovan.infura.io/v3/" + process.env.INFURA_PROJECT_ID, httpOptions),
-          pollingInterval: 2000
-        }),
+      provider: () => new HDWalletProvider({
+        mnemonic: process.env.BIP39_MNEMONIC,
+        providerOrUrl: new Web3HttpProvider("https://kovan.infura.io/v3/" + process.env.INFURA_PROJECT_ID, httpOptions),
+        pollingInterval: 2000
+      }),
       network_id: '42', //https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
       //gas: 7E6,
       //gasPrice: 5E10
     },
     
     kovan_ws: {
-      provider: () => 
-        new HDWalletProvider({
+      provider: () => {
+        // Monkey patch to support `web3.eth.subscribe()` function
+        // https://github.com/trufflesuite/truffle/issues/2567
+        const wsProvider = new Web3WsProvider("wss://kovan.infura.io/ws/v3/" + process.env.INFURA_PROJECT_ID, wsOptions);
+        HDWalletProvider.prototype.on = wsProvider.on.bind(wsProvider);
+        return new HDWalletProvider({
           mnemonic: process.env.BIP39_MNEMONIC,
-          providerOrUrl: new Web3WsProvider("wss://kovan.infura.io/ws/v3/" + process.env.INFURA_PROJECT_ID, wsOptions),
+          providerOrUrl: wsProvider,
           pollingInterval: 2000
-        }),
+        });
+      },
       network_id: '42', //https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
       websockets: true, 
       //gas: 7E6,
       //gasPrice: 5E10
+    },
 
-    }
+    // Goerli : PoA
+    // GitHub : https://github.com/goerli/testnet
+    // Explorer : https://goerli.etherscan.io/
+    // Faucet : 
+    // Avg. Block Time : 15s
+    goerli: {
+      provider: () => new HDWalletProvider({
+        mnemonic: process.env.BIP39_MNEMONIC,
+        providerOrUrl: new Web3HttpProvider("https://goerli.infura.io/v3/" + process.env.INFURA_PROJECT_ID, httpOptions),
+        pollingInterval: 15000
+      }),
+      network_id: '5'
+    },
+    
+    // Klaytn Testnet
+    baobab: {
+      provider: () => new HDWalletProvider({
+        mnemonic: process.env.BIP39_MNEMONIC,
+        providerOrUrl: new Web3HttpProvider("https://api.baobab.klaytn.net:8651/", httpOptions),
+        pollingInterval: 2000
+      }),
+      network_id: '1001'
+    },
+    
+    // Binance Smart Chain Testnet
+    // https://docs.binance.org/smart-chain/developer/deploy/truffle.html
+    // GitHub : 
+    // Explorer : https://testnet.bscscan.com/
+    // Faucet : https://testnet.binance.org/faucet-smart
+    // Avg. Block Time : 3s
+    bsc_test: {
+      provider: () => new HDWalletProvider({
+        mnemonic: process.env.BIP39_MNEMONIC,
+        providerOrUrl: new Web3HttpProvider("https://data-seed-prebsc-1-s1.binance.org:8545", httpOptions),
+        pollingInterval: 3500
+      }),
+      network_id: '97',
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },    
+    
   },
 
   // https://github.com/mochajs/mocha/blob/v5.2.0/lib/mocha.js#L64
