@@ -22,6 +22,7 @@ CVS/
 /x86/
 /x64/
 /obj/
+/package/
 
 # dependencies
 /node_modules/
