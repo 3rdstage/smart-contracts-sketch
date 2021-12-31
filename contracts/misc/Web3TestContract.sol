@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.5;
 
@@ -145,6 +146,5 @@ contract Web3TestContract{
     function getMemo() public view returns(string memory){
         return _memo;
     }
-
 
 }
