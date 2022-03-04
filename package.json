@@ -22,20 +22,18 @@
     "!/examples"
   ],
   "dependencies": {
-    "solc": "^0.8.6",
-    "web3": "^1.5.0",
+    "solc": "^0.6.12",
+    "web3": "^1.6.0",
     "web3-providers-http": "^1.5.0",
     "web3-providers-ws": "^1.5.0",
     "@openzeppelin/contracts": "^3.4.1",
     "@openzeppelin/contracts-4": "npm:@openzeppelin/contracts@^4.1.0",
-    "@remix-project/remixd": "^0.5.0",
-    "@truffle/hdwallet-provider": "^1.6.0",
-    "solc": "^0.6.12",
-    "web3": "^1.6.0"
+    "@remix-project/remixd": "^0.5.0"
   },
   "devDependencies": {
     "@openzeppelin/test-environment": "^0.1.4",
     "@openzeppelin/test-helpers": "^0.5.6",
+    "@truffle/hdwallet-provider": "^1.7.0",
     "chance": "^1.1.7",
     "elliptic": "6.5.4",
     "eth-lib": "0.2.8",
@@ -43,7 +41,7 @@
     "secp256k1": "4.0.2"
   },
   "engines": {
-    "node": ">=10.0"
+    "node": ">=12.0"
   },
   "scripts": {
     "//": [
