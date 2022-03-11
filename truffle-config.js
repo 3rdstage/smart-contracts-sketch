@@ -216,7 +216,7 @@ module.exports = {
     timeout: 180000
   },
 
-  // http://truffleframework.com/docs/advanced/configuration
+  // https://trufflesuite.com/docs/truffle/reference/configuration.html
   // https://solidity.readthedocs.io/en/v0.6.6/using-the-compiler.html#target-options
   compilers: {
     solc: {

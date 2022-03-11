@@ -1,4 +1,4 @@
-const ERC721Regular = artifacts.require("ERC721Regular");
+const ERC721Exportable = artifacts.require("ERC721Exportable");
 
 
 module.exports = async function (deployer, network, accounts) {
@@ -9,13 +9,14 @@ module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const options = {from: admin, overwrite: true};
   
-  await deployer.deploy(ERC721Regular, 'Deep Sky', 'DSO', options);
-  const cntr = await ERC721Regular.deployed();
+  await deployer.deploy(ERC721Exportable, 'Deep Sky 2', 'DSO', options);
+  const cntr = await ERC721Exportable.deployed();
   
   const logs = [
     {key: 'Target Newtork', value: network},
     {key: 'Deployer Account', value: admin},
-    {key: 'ERC721Regular Contract', value: cntr.address}
+    {key: 'ERC721Exportable Contract', value: cntr.address},
+    {key: 'Compiler Version', value: ERC721Exportable.compiler.version}
   ]
   
   console.table(logs);

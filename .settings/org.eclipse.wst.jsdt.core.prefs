@@ -307,4 +307,4 @@ org.eclipse.wst.jsdt.core.formatter.tabulation.size=2
 org.eclipse.wst.jsdt.core.formatter.use_tabs_only_for_leading_indentations=false
 org.eclipse.wst.jsdt.core.formatter.wrap_before_binary_operator=true
 semanticValidation=enabled
-strictOnKeywordUsage=disabled
+strictOnKeywordUsage=enabled
