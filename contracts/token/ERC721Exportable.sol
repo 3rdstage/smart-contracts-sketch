@@ -40,7 +40,7 @@ contract ERC721Exportable is ERC721PresetMinterPauserAutoId, ERC721URIStorage {
     function exported(uint256 tokenId) public {
         require(hasRole(MINTER_ROLE, msg.sender), "ERC721Exportable: Minter role is required to set token exported");
 
-        _setExporting(tokenId);
+        _setExported(tokenId);
     }
 
     function _setExported(uint256 tokenId) internal virtual {

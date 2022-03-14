@@ -20,7 +20,7 @@ const { constants, expectEvent, expectRevert } = require('@openzeppelin/test-hel
 // NOTE : This is test for the contract located at `0xFD9f0484568cf275F11bA103f9f814f7FDea38b9` address in Rinkeby
 //        deployed by `0xb009cd53957c0D991CAbE184e884258a1D7b77D9` at 2022/03/04
 const ADMIN_ADDRESS = '0xb009cd53957c0D991CAbE184e884258a1D7b77D9';
-const CONTRACT_ADDRESS = '0xFD9f0484568cf275F11bA103f9f814f7FDea38b9';
+const CONTRACT_ADDRESS = '0xB31504D8969f21cD787037288135b6FFe0BD81De';
 
 "use strict";
 contract("ERC721Exportable Contract Test Suite", async accounts => {
@@ -32,6 +32,7 @@ contract("ERC721Exportable Contract Test Suite", async accounts => {
       Transfer: 'Transfer',
       Approval: 'Approval'
   }
+  
 
   async function createFixtures(){
     const chance = new Chance();
@@ -56,11 +57,15 @@ contract("ERC721Exportable Contract Test Suite", async accounts => {
     console.table(output);
   });
 
-  describe("Locking", () => {
+  describe("Export and import", () => {
+    
+    let [chance, admin, token] = [null, null, null];
+    
+    before(async () => {
+      [chance, admin, token] = await createFixtures();
+    });
 
-    // name(), symbol(), decimals()
-    it("Can set exporting", async() => {
-      const [chance, admin, token] = await createFixtures();
+    it("Owner can set a token in normal status (owned by someone) to be exporting losing the ownership.", async() => {
       
       const mintee = accounts[1];
       const result = await token.mint(mintee, {from: admin});
@@ -68,13 +73,67 @@ contract("ERC721Exportable Contract Test Suite", async accounts => {
       assert.isTrue(result.receipt.status);
       assert.equal(result.logs[0].event, EventNames.Transfer);
       
-      const id = result.logs.filter(log => log.address == CONTRACT_ADDRESS && log.event == EventNames.Transfer)[0].args.tokenId;
+      const id = result.logs.filter(log => log.event == EventNames.Transfer)[0].args.tokenId;
       console.log(`A new token of ID ${id} is minted.`);
       
       // try to burn the right previously minted token
-      const result2 = await token.setExporting(id, {from: mintee});
+      const result2 = await token.exporting(id, {from: mintee});
       
-      console.log(result2);
+      assert.isTrue(result2.receipt.status);
+      assert.isAbove(result.logs.filter(log => log.event == EventNames.Transfer).length, 0);
+      
+      console.log(`Token ${id} is set to be exporting.`);
     });
+    
+    it("Admin can set a token in exporting status to be exported.", async() =>{
+      
+      const mintee = accounts[1];
+      const result = await token.mint(mintee, {from: admin});
+      assert.isTrue(result.receipt.status);
+      
+      const id = result.logs.filter(log => log.event == EventNames.Transfer)[0].args.tokenId;
+      console.log(`A new token of ID ${id} is minted.`);
+      
+      // try to burn the right previously minted token
+      const result2 = await token.exporting(id, {from: mintee});
+      assert.isTrue(result2.receipt.status);
+      
+      console.log(`Token ${id} is set to be exporting.`);
+
+      const result3 = await token.exported(id, {from: admin});
+      assert.isTrue(result3.receipt.status);
+      
+      console.log(`Token ${id} is set to be exported.`);
+    });
+    
+    
+    it("Admin can set a token in exported status to be imported.", async() =>{
+      
+      const mintee = accounts[1];
+      const result = await token.mint(mintee, {from: admin});
+      assert.isTrue(result.receipt.status);
+      
+      const id = result.logs.filter(log => log.event == EventNames.Transfer)[0].args.tokenId;
+      console.log(`A new token of ID ${id} is minted.`);
+      
+      // try to burn the right previously minted token
+      const result2 = await token.exporting(id, {from: mintee});
+      assert.isTrue(result2.receipt.status);
+      
+      console.log(`Token ${id} is set to be exporting.`);
+
+      const result3 = await token.exported(id, {from: admin});
+      assert.isTrue(result3.receipt.status);
+      
+      console.log(`Token ${id} is set to be exported.`);
+      
+      const result4 = await token.imported(id, mintee);
+      assert.isTrue(result4.receipt.status);
+      assert.isAbove(result4.logs.filter(log => log.event == EventNames.Transfer).length, 0);
+
+      console.log(result4);
+    });
+    
+    
   });
 });
