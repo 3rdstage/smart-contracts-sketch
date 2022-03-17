@@ -9,7 +9,7 @@ module.exports = async function (deployer, network, accounts) {
   const admin = accounts[0];
   const options = {from: admin, overwrite: true};
   
-  await deployer.deploy(ERC721Exportable, 'Deep Sky 2', 'DSO', options);
+  await deployer.deploy(ERC721Exportable, 'My Life Photos', 'MLP', options);
   const cntr = await ERC721Exportable.deployed();
   
   const logs = [

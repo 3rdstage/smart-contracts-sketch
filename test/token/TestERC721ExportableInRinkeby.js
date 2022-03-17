@@ -1,4 +1,5 @@
 const Token = artifacts.require("ERC721Exportable");
+const testcases = require('./ERC721ExportableTestCases');
 const Chance = require('chance');
 const toBN = web3.utils.toBN;
 const { constants, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
@@ -20,7 +21,16 @@ const { constants, expectEvent, expectRevert } = require('@openzeppelin/test-hel
 // NOTE : This is test for the contract located at `0xFD9f0484568cf275F11bA103f9f814f7FDea38b9` address in Rinkeby
 //        deployed by `0xb009cd53957c0D991CAbE184e884258a1D7b77D9` at 2022/03/04
 const ADMIN_ADDRESS = '0xb009cd53957c0D991CAbE184e884258a1D7b77D9';
-const CONTRACT_ADDRESS = '0xB31504D8969f21cD787037288135b6FFe0BD81De';
+const CONTRACT_ADDRESS = '0xD3951a7C3f9A8b716f368DFd9e4446dAD89b2428';
+
+const factoryFunc = async (admin) => {
+  const token = await Token.at(CONTRACT_ADDRESS);
+  
+  console.debug(`Found deployed contract - name: ${Token.toJSON().contractName}, address: ${token.address}`)
+  //console.debug(token);
+  return token;
+}
+
 
 "use strict";
 contract("ERC721Exportable Contract Test Suite", async accounts => {
@@ -57,83 +67,6 @@ contract("ERC721Exportable Contract Test Suite", async accounts => {
     console.table(output);
   });
 
-  describe("Export and import", () => {
-    
-    let [chance, admin, token] = [null, null, null];
-    
-    before(async () => {
-      [chance, admin, token] = await createFixtures();
-    });
-
-    it("Owner can set a token in normal status (owned by someone) to be exporting losing the ownership.", async() => {
-      
-      const mintee = accounts[1];
-      const result = await token.mint(mintee, {from: admin});
-      
-      assert.isTrue(result.receipt.status);
-      assert.equal(result.logs[0].event, EventNames.Transfer);
-      
-      const id = result.logs.filter(log => log.event == EventNames.Transfer)[0].args.tokenId;
-      console.log(`A new token of ID ${id} is minted.`);
-      
-      // try to burn the right previously minted token
-      const result2 = await token.exporting(id, {from: mintee});
-      
-      assert.isTrue(result2.receipt.status);
-      assert.isAbove(result.logs.filter(log => log.event == EventNames.Transfer).length, 0);
-      
-      console.log(`Token ${id} is set to be exporting.`);
-    });
-    
-    it("Admin can set a token in exporting status to be exported.", async() =>{
-      
-      const mintee = accounts[1];
-      const result = await token.mint(mintee, {from: admin});
-      assert.isTrue(result.receipt.status);
-      
-      const id = result.logs.filter(log => log.event == EventNames.Transfer)[0].args.tokenId;
-      console.log(`A new token of ID ${id} is minted.`);
-      
-      // try to burn the right previously minted token
-      const result2 = await token.exporting(id, {from: mintee});
-      assert.isTrue(result2.receipt.status);
-      
-      console.log(`Token ${id} is set to be exporting.`);
-
-      const result3 = await token.exported(id, {from: admin});
-      assert.isTrue(result3.receipt.status);
-      
-      console.log(`Token ${id} is set to be exported.`);
-    });
-    
-    
-    it("Admin can set a token in exported status to be imported.", async() =>{
-      
-      const mintee = accounts[1];
-      const result = await token.mint(mintee, {from: admin});
-      assert.isTrue(result.receipt.status);
-      
-      const id = result.logs.filter(log => log.event == EventNames.Transfer)[0].args.tokenId;
-      console.log(`A new token of ID ${id} is minted.`);
-      
-      // try to burn the right previously minted token
-      const result2 = await token.exporting(id, {from: mintee});
-      assert.isTrue(result2.receipt.status);
-      
-      console.log(`Token ${id} is set to be exporting.`);
-
-      const result3 = await token.exported(id, {from: admin});
-      assert.isTrue(result3.receipt.status);
-      
-      console.log(`Token ${id} is set to be exported.`);
-      
-      const result4 = await token.imported(id, mintee);
-      assert.isTrue(result4.receipt.status);
-      assert.isAbove(result4.logs.filter(log => log.event == EventNames.Transfer).length, 0);
-
-      console.log(result4);
-    });
-    
-    
-  });
+  testcases.exportTest(accounts, accounts[0], factoryFunc);
+  
 });

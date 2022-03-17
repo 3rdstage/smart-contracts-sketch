@@ -22,24 +22,23 @@
     "!/examples"
   ],
   "dependencies": {
-    "@openzeppelin/contracts": "~3.4.1",
+    "@openzeppelin/contracts": "3.4.2",
     "@openzeppelin/contracts-4": "npm:@openzeppelin/contracts@4.5.0",
-    "@remix-project/remixd": "^0.5.0",
-    "web3-providers-http": "^1.5.0",
-    "web3-providers-ws": "^1.5.0"
+    "@remix-project/remixd": "~0.5.0"
   },
   "devDependencies": {
-    "@openzeppelin/test-environment": "^0.1.4",
-    "@openzeppelin/test-helpers": "^0.5.6",
-    "@truffle/hdwallet-provider": "^1.7.0",
+    "@openzeppelin/test-environment": "~0.1.4",
+    "@openzeppelin/test-helpers": "~0.5.6",
+    "@truffle/hdwallet-provider": "~1.7.0",
     "chance": "^1.1.7",
     "elliptic": "6.5.4",
     "eth-lib": "0.2.8",
-    "rlp": "^2.2.6",
-    "secp256k1": "4.0.2"
+    "rlp": "~2.2.6",
+    "secp256k1": "4.0.2",
+    "web3": "~1.5.1"
   },
   "engines": {
-    "node": ">=10.0"
+    "node": ">=12.0"
   },
   "scripts": {
     "//": [
