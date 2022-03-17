@@ -1,6 +1,6 @@
 
-const DocDigests = artifacts.require("DocDigests");
+const Contract = artifacts.require("DocDigests");
 
 module.exports = function (deployer) {
-  deployer.deploy(DocDigests);
+  deployer.deploy(Contract);
 };

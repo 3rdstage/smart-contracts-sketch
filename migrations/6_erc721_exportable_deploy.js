@@ -1,25 +1,25 @@
-const ERC721Exportable = artifacts.require("ERC721Exportable");
+const Contract = artifacts.require("ERC721Exportable");
 
 
 module.exports = async function (deployer, network, accounts) {
   'use strict';
  
-  console.debug('Starting to deploy ERC721 contracts');
+  console.debug(`Starting to deploy ${Contract.contractName} contracts`);
   const startAt = Date.now();
   const admin = accounts[0];
   const options = {from: admin, overwrite: true};
   
-  await deployer.deploy(ERC721Exportable, 'My Life Photos', 'MLP', options);
-  const cntr = await ERC721Exportable.deployed();
+  await deployer.deploy(Contract, 'My Life Photos', 'MLP', options);
+  const cntr = await Contract.deployed();
   
   const logs = [
     {key: 'Target Newtork', value: network},
     {key: 'Deployer Account', value: admin},
-    {key: 'ERC721Exportable Contract', value: cntr.address},
-    {key: 'Compiler Version', value: ERC721Exportable.compiler.version}
+    {key: 'Contract Name', value: Contract.contractName},
+    {key: 'Deployed Address', value: cntr.address},
+    {key: 'Compiler Version', value: Contract.compiler.version},
+    {key: 'Deployment time duration (ms)', value: (Date.now() - startAt)}
   ]
-  
   console.table(logs);
-  console.debug(`Finished contract deployment: ${Date.now() - startAt} milli-sec.`);
 
 }
