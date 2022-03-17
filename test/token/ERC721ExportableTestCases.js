@@ -47,6 +47,27 @@ async function assertTokenInStateOnly(contract, id, state){
   console.debug(`Imported tokens : ${tokens.get(States.Imported)}`);
 }
 
+async function mintAndSetExporting(contract, admin, mintee, escrowee){
+  const result = await contract.mint(mintee, {from: admin});
+  const id = result.logs.filter(log => log.event == EventNames.Transfer)[0].args.tokenId;
+  console.debug(`A new token of ID ${id} is minted.`);
+
+  await contract.approve(escrowee, id, {from: mintee});
+  await contract.exporting(id, escrowee, {from: escrowee});
+  console.debug(`The token ${id} is exporting.`);
+  
+  return id;
+}
+
+async function mintAndSetExported(contract, admin, mintee, escrowee){
+
+  const id = await mintAndSetExporting(contract, admin, mintee, escrowee);
+  await contract.exported(id, {from: escrowee});
+  console.debug(`The token ${id} is exported.`);
+  
+  return id;
+}
+
 exports.exportTest = (accounts, admin, factoryFunc) => {
   
   describe("Normal cases", () => {
@@ -175,6 +196,87 @@ exports.exportTest = (accounts, admin, factoryFunc) => {
 
       await assertTokenInStateOnly(contract, id, States.Exporting);
 
+    });
+  });
+    
+  describe.only("Abnormal cases", () => {
+    
+    let contract = null;
+    
+    before(async() => {
+      contract = await factoryFunc(admin);
+    });
+    
+    it("A token ID not minted yet can't be set exporting.", async() =>{
+      const chance = new Chance();
+      const mintee = accounts[1];
+      const escrowee = accounts[2];
+      const importee = accounts[3];
+      
+      const n = await contract.totalSupply();
+      
+      await expectRevert.unspecified(contract.exporting(n.addn(100), escrowee, {from: admin}));
+    
+    });
+    
+    it("A token in exporting state can't be set exporting.", async() =>{
+      const chance = new Chance();
+      const mintee = accounts[1];
+      const escrowee = accounts[2];
+      
+      const id = await mintAndSetExporting(contract, admin, mintee, escrowee)
+      
+      const accounts2 = chance.pickset(accounts.filter(acct => acct != escrowee), 5);
+      for(const acct of accounts2){
+        await contract.approve(acct, id, {from: escrowee});
+        await expectRevert.unspecified(contract.exporting(id, acct, {from: escrowee}));
+      }
+    });
+    
+    
+    it("A token in exported state can't be approved to anyone.", async() => {
+      const chance = new Chance();
+      const mintee = accounts[1];
+      const escrowee = accounts[2];
+      const anyone = chance.pickone(accounts);
+      
+      const id = await mintAndSetExported(contract, admin, mintee, escrowee);
+      
+      await expectRevert.unspecified(contract.approve(anyone, id, {from: admin}));
+      await expectRevert.unspecified(contract.approve(anyone, id, {from: mintee}));
+      await expectRevert.unspecified(contract.approve(anyone, id, {from: escrowee}));
+      await expectRevert.unspecified(contract.approve(anyone, id, {from: anyone}));
+    });
+    
+    
+    it("A token in exported state can't be set exporting.", async() => {
+      const chance = new Chance();
+      const mintee = accounts[1];
+      const escrowee = accounts[2];
+      
+      const id = await mintAndSetExported(contract, admin, mintee, escrowee);
+      
+      await expectRevert.unspecified(contract.exporting(id, chance.pickone(accounts), {from: admin}));
+      
+      const accounts2 = chance.pickset(accounts, 5);
+      for(const acct of accounts2){
+        await expectRevert.unspecified(contract.exporting(id, acct, {from: acct}));
+      }
+    });
+    
+    it("A token in normal state can't be set exported by the message sender who is not the onwer nor the approved.", async() => {
+      const chance = new Chance();
+      const mintee = accounts[1];
+      const escrowee = accounts[2];
+      
+      const result = await contract.mint(mintee, {from: admin});
+      const id = result.logs.filter(log => log.event == EventNames.Transfer)[0].args.tokenId;
+      console.debug(`A new token of ID ${id} is minted.`);
+
+      const accounts2 = chance.pickset(accounts.filter(acct => ![mintee, escrowee].includes(acct)), 5);
+      for(const acct of accounts2){
+        await expectRevert.unspecified(contract.exporting(id, acct, {from: acct}));
+      }
     });
     
     
