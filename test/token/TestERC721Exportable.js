@@ -27,7 +27,10 @@ contract("ERC721Exportable Contract Test Suite", async accounts => {
   });
   
   
-  testcases.exportTest(accounts, accounts[0], factoryFunc);
+  testcases.basicCases(accounts, accounts[0], factoryFunc);
+  testcases.extendedCases(accounts, accounts[0], factoryFunc);
+  testcases.abnormalCases(accounts, accounts[0], factoryFunc);
+  testcases.unusualCases(accounts, accounts[0], factoryFunc);
     
 });
 

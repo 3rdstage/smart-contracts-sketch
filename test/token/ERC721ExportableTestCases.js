@@ -47,30 +47,65 @@ async function assertTokenInStateOnly(contract, id, state){
   console.debug(`Imported tokens : ${tokens.get(States.Imported)}`);
 }
 
-async function mintAndSetExporting(contract, admin, mintee, escrowee){
+/**
+ * Mint a new token and return the ID.
+ *
+ * @returns the ID of minted token
+ */
+async function mint(contract, admin, mintee){
   const result = await contract.mint(mintee, {from: admin});
   const id = result.logs.filter(log => log.event == EventNames.Transfer)[0].args.tokenId;
-  console.debug(`A new token of ID ${id} is minted.`);
-
-  await contract.approve(escrowee, id, {from: mintee});
-  await contract.exporting(id, escrowee, {from: escrowee});
-  console.debug(`The token ${id} is exporting.`);
+  console.debug(`A new token of ID ${id} is minted. - owner: ${mintee}, minter: ${admin}`);
   
   return id;
 }
 
-async function mintAndSetExported(contract, admin, mintee, escrowee){
+/**
+ * Mint a new token and set it exporting.
+ *
+ * @returns the ID of token exporting
+ */
+async function mintToExporting(contract, admin, mintee, escrowee){
+  const id = await mint(contract, admin, mintee);
+  await contract.approve(escrowee, id, {from: mintee});
+  await contract.exporting(id, escrowee, {from: escrowee});
+  console.debug(`The token ${id} is exporting. - escrowee: ${escrowee}`);
+  
+  return id;
+}
 
-  const id = await mintAndSetExporting(contract, admin, mintee, escrowee);
+/**
+ * Mint a new token, set it exporting and then set it exported.
+ *
+ * @returns the ID of exported token
+ */
+async function mintToExported(contract, admin, mintee, escrowee){
+
+  const id = await mintToExporting(contract, admin, mintee, escrowee);
   await contract.exported(id, {from: escrowee});
   console.debug(`The token ${id} is exported.`);
   
   return id;
 }
 
-exports.exportTest = (accounts, admin, factoryFunc) => {
+/**
+ * Mint a new token, set it exporting, exported and then import it.
+ *
+ * @returns the ID of token imported
+ */
+async function mintToImported(contract, admin, mintee, escrowee, importee){
+  const id = await mintToExported(contract, admin, mintee, escrowee);
+  await contract.imported(id, importee, {from: admin});
+  console.debug(`The token ${id} is imported. - importee: ${importee}, minter: ${admin}`);
   
-  describe("Normal cases", () => {
+  return id;
+}
+
+// TODO - Check the number of accounts is equal or more than the minimun 7 or more
+
+exports.basicCases = (accounts, admin, factoryFunc) => {
+  
+  describe("Normal basic cases", () => {
     
     let contract = null;
     
@@ -198,8 +233,115 @@ exports.exportTest = (accounts, admin, factoryFunc) => {
 
     });
   });
+
+};
+
+
+exports.extendedCases = (accounts, admin, factoryFunc) => {
+  
+  describe("Normal extended cases", () => {
     
-  describe.only("Abnormal cases", () => {
+    let contract = null;
+    
+    before(async() => {
+      contract = await factoryFunc(admin);
+    });
+    
+    
+    it("A token imported can be transferred by the owner.", async() =>{
+      const chance = new Chance();
+      const mintee = accounts[1];
+      const escrowee = accounts[2];
+      const importee = accounts[3]; // owner of imported token
+      const recipient = chance.pickone(accounts.filter(acct => acct != importee));
+      
+      const id = await mintToImported(contract, admin, mintee, escrowee, importee);
+      const result = await contract.transferFrom(importee, recipient, id, {from: importee});
+      assert.isTrue(result.receipt.status);
+      
+      console.debug(`The token ${id} is transferred - from: ${importee}, to: ${recipient}, by: ${importee}`);
+    });
+    
+    it("A token imported can be transferred by the approved.", async() =>{
+      const chance = new Chance();
+      const mintee = accounts[1];
+      const escrowee = accounts[2];
+      const importee = accounts[3]; // owner of imported token
+      const [approved, recipient] = chance.pickset(accounts.filter(acct => acct != importee), 2);
+      
+      const id = await mintToImported(contract, admin, mintee, escrowee, importee);
+      await contract.approve(approved, id, {from: importee});
+      console.debug(`The token ${id} is approved. - owner: ${importee}, approved: ${approved}`)
+
+      const result = await contract.transferFrom(importee, recipient, id, {from: approved});
+      assert.isTrue(result.receipt.status);
+      console.debug(`The token ${id} is transferred. - from: ${importee}, to: ${recipient}, by: ${approved}`);
+    });
+    
+    it("Setting a token exporting doesn't change total supply at all.", async() => {
+      const chance = new Chance();
+      const loops = chance.natural({min: 3, max: 7});
+      
+      let mintee = null, escrowee = null;
+      let id =0, tokens = 0, tokens2 = 0;
+      for(let i = 0; i < loops; i++){
+        [mintee, escrowee] = chance.pickset(accounts, 2);
+        id = await mint(contract, admin, mintee);
+        tokens = await contract.totalSupply(); // total supply before exporting
+        console.debug(`Total supply is ${tokens}`);
+
+        await contract.exporting(id, escrowee, {from: mintee});
+        tokens2 = await contract.totalSupply();
+        assert.isTrue(tokens.eq(tokens2));
+        console.debug(`Total supply remains unchanged after exporting. - ${tokens2}`);
+      };
+    });
+    
+    it("Setting a token exported decreases total supply by 1.", async() => {
+      const chance = new Chance();
+      const loops = chance.natural({min: 3, max: 7});
+      
+      let mintee = null, escrowee = null;
+      let id =0, tokens = 0, tokens2 = 0;
+      for(let i = 0; i < loops; i++){
+        [mintee, escrowee] = chance.pickset(accounts, 2);
+        id = await mintToExporting(contract, admin, mintee, escrowee);
+        tokens = await contract.totalSupply(); // total supply before exporting
+        console.debug(`Total supply is ${tokens}`);
+
+        await contract.exported(id, {from: escrowee});
+        tokens2 = await contract.totalSupply();
+        assert.isTrue(tokens.subn(1).eq(tokens2));
+        console.debug(`Total supply decreases by 1 after exported token ${id}. - ${tokens2}`);
+      };
+    });
+    
+    it("Setting a token imported increases total supply by 1.", async() => {
+      const chance = new Chance();
+      const loops = chance.natural({min: 3, max: 7});
+      
+      let mintee = null, escrowee = null;
+      let id =0, tokens = 0, tokens2 = 0;
+      for(let i = 0; i < loops; i++){
+        [mintee, escrowee, importee] = chance.pickset(accounts, 3);
+        id = await mintToExported(contract, admin, mintee, escrowee);
+        tokens = await contract.totalSupply(); // total supply before exporting
+        console.debug(`Total supply is ${tokens}`);
+
+        await contract.imported(id, importee, {from: admin});
+        tokens2 = await contract.totalSupply();
+        assert.isTrue(tokens.addn(1).eq(tokens2));
+        console.debug(`Total supply increases by 1 after imported token ${id}. - ${tokens2}`);
+      };
+    });
+    
+    
+  });
+};
+
+exports.abnormalCases = (accounts, admin, factoryFunc) => {
+    
+  describe("Abnormal cases", () => {
     
     let contract = null;
     
@@ -216,7 +358,6 @@ exports.exportTest = (accounts, admin, factoryFunc) => {
       const n = await contract.totalSupply();
       
       await expectRevert.unspecified(contract.exporting(n.addn(100), escrowee, {from: admin}));
-    
     });
     
     it("A token in exporting state can't be set exporting.", async() =>{
@@ -224,7 +365,7 @@ exports.exportTest = (accounts, admin, factoryFunc) => {
       const mintee = accounts[1];
       const escrowee = accounts[2];
       
-      const id = await mintAndSetExporting(contract, admin, mintee, escrowee)
+      const id = await mintToExporting(contract, admin, mintee, escrowee)
       
       const accounts2 = chance.pickset(accounts.filter(acct => acct != escrowee), 5);
       for(const acct of accounts2){
@@ -240,7 +381,7 @@ exports.exportTest = (accounts, admin, factoryFunc) => {
       const escrowee = accounts[2];
       const anyone = chance.pickone(accounts);
       
-      const id = await mintAndSetExported(contract, admin, mintee, escrowee);
+      const id = await mintToExported(contract, admin, mintee, escrowee);
       
       await expectRevert.unspecified(contract.approve(anyone, id, {from: admin}));
       await expectRevert.unspecified(contract.approve(anyone, id, {from: mintee}));
@@ -254,7 +395,7 @@ exports.exportTest = (accounts, admin, factoryFunc) => {
       const mintee = accounts[1];
       const escrowee = accounts[2];
       
-      const id = await mintAndSetExported(contract, admin, mintee, escrowee);
+      const id = await mintToExported(contract, admin, mintee, escrowee);
       
       await expectRevert.unspecified(contract.exporting(id, chance.pickone(accounts), {from: admin}));
       
@@ -278,8 +419,31 @@ exports.exportTest = (accounts, admin, factoryFunc) => {
         await expectRevert.unspecified(contract.exporting(id, acct, {from: acct}));
       }
     });
-    
-    
   });
 };
 
+
+exports.unusualCases = (accounts, admin, factoryFunc) => {
+    
+  describe("Abnormal cases", () => {
+    
+    let contract = null;
+    
+    before(async() => {
+      contract = await factoryFunc(admin);
+    });
+
+    it("A token can be set exporting escrowed by the current owner.", async() =>{
+      const chance = new Chance();
+      const mintee = accounts[1];
+      
+      const id = await mint(contract, admin, mintee);
+      const result = await contract.exporting(id, mintee, {from: mintee});
+      assert.isTrue(result.receipt.status);
+      const escrowee = await contract.ownerOf(id);
+      
+      console.debug(`Exporting token ${id} is escrowed to ${escrowee}`);
+      
+    });
+  });
+};
