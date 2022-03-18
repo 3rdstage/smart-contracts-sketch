@@ -208,12 +208,17 @@ module.exports = {
     
   },
 
-  // https://github.com/mochajs/mocha/blob/v5.2.0/lib/mocha.js#L64
+  // https://github.com/mochajs/mocha/blob/v8.1.2/lib/mocha.js#L97
   // https://mochajs.org/#command-line-usage
+  // https://mochajs.org/api/mocha
   mocha: {
-    useColors: true,
-    enableTimeouts: true,
-    timeout: 180000
+    color: true,
+    //useColor: true,
+    fullTrace: true,
+    noHighlighting: false,
+    //enableTimeouts: true,
+    timeout: 180000,
+    parallel: false
   },
 
   // https://trufflesuite.com/docs/truffle/reference/configuration.html
