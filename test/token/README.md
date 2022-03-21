@@ -21,7 +21,6 @@
 #### Abnormal cases
 
 * A token ID not minted yet can't be set exporting.
-* A token can be set exporting escrowed by the current owner.
 * A token in exporting state can't be set exporting.
 * A token in exported state can't be approved to anyone.
 * A token in exported state can't be set exporting.
@@ -30,3 +29,5 @@
 #### Unusual cases
 
 * A token in exporting state can be transferred by the escrowee.
+* A token can be set exporting escrowed by the current owner.
+
