@@ -425,7 +425,7 @@ exports.abnormalCases = (accounts, admin, factoryFunc) => {
 
 exports.unusualCases = (accounts, admin, factoryFunc) => {
     
-  describe("Abnormal cases", () => {
+  describe("Unusual cases", () => {
     
     let contract = null;
     
