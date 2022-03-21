@@ -45,6 +45,8 @@
       "https://docs.npmjs.com/files/package.json",
       "https://github.com/OpenZeppelin/zeppelin-solidity#getting-started"
     ],
-    "preinstall": ""
+    "preinstall": "",
+    "remixd" : "./scripts/remixd-start.sh",
+    "ganache" : "./scripts/ganache-cli-start.sh"
   }
 }
