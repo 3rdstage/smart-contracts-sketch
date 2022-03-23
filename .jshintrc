@@ -1,3 +1,22 @@
 {
-  
+  "esversion": 8,
+  "curly" : true,
+  "eqeqeq" : true,
+  "forin" : true,
+  "latedef" : "nofunc",
+  "noarg" : true,
+  "nonew" : false,
+  "quotmark" : false,
+  "strict" : false,
+  "undef" : true,
+  "unused" : false,
+  "globals" : {
+    "assert" : true,
+    "web3": true,
+    "artifacts": true,
+    "contract": true,
+    "accounts": true
+  },
+  "node": true,
+  "mocha": true
 }
