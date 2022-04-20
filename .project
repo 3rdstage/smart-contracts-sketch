@@ -32,8 +32,44 @@
 		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
 	</natures>
 	<filteredResources>
-		<filter>
-			<id>1647484136919</id>
+    <filter>
+      <id>1650462677543</id>
+      <name></name>
+      <type>26</type>
+      <matcher>
+        <id>org.eclipse.ui.ide.multiFilter</id>
+        <arguments>1.0-projectRelativePath-matches-false-true-node_modules/(?!.*openzeppelin).*</arguments>
+      </matcher>
+    </filter>
+    <filter>
+      <id>1650462677542</id>
+      <name></name>
+      <type>26</type>
+      <matcher>
+        <id>org.eclipse.ui.ide.multiFilter</id>
+        <arguments>1.0-projectRelativePath-matches-false-true-contracts/(.*/)?artifacts</arguments>
+      </matcher>
+    </filter>
+    <filter>
+      <id>1650462677539</id>
+      <name></name>
+      <type>26</type>
+      <matcher>
+        <id>org.eclipse.ui.ide.multiFilter</id>
+        <arguments>1.0-projectRelativePath-matches-false-true-.*__pycache__</arguments>
+      </matcher>
+    </filter>
+    <filter>
+      <id>1650462677545</id>
+      <name></name>
+      <type>26</type>
+      <matcher>
+        <id>org.eclipse.ui.ide.multiFilter</id>
+        <arguments>1.0-projectRelativePath-matches-false-false-.pytest_cache</arguments>
+      </matcher>
+    </filter>
+    <filter>
+			<id>1650462677534</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -42,7 +78,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1647484136925</id>
+			<id>1650462677537</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -51,39 +87,12 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1647484136932</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-true-.*__pycache__</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1647484136933</id>
+			<id>1650462677540</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
 				<id>org.eclipse.ui.ide.multiFilter</id>
 				<arguments>1.0-projectRelativePath-matches-false-false-run/geth/data</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1647484136939</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-true-contracts/(.*/)?artifacts</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1647484136939</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-true-node_modules/(?!.*openzeppelin).*</arguments>
 			</matcher>
 		</filter>
 	</filteredResources>
