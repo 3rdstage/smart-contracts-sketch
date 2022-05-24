@@ -41,18 +41,18 @@ const wsOptions = {
 // https://infura.io/docs/gettingStarted/chooseaNetwork
 // https://ethereum.stackexchange.com/questions/27048/comparison-of-the-different-testnets
 module.exports = {
-  
+
   contracts_build_directory: "./build/truffle",  // default: ./build/contracts
 
   networks: {
-    
+
     // https://www.trufflesuite.com/docs/truffle/reference/choosing-an-ethereum-client#truffle-develop
     builtin: {    // truffle built-in client : aka `truffle develop`
       host: '127.0.0.1',
       port: 9545,
       network_id: "*"
     },
-    
+
     development: {
       host: ganache.host,
       port: ganache.port,
@@ -60,15 +60,18 @@ module.exports = {
       gas: 3E8,
       gasPrice: 0,
       websockets: ganache.websocket,
-      skipDryRun: true
+      skipDryRun: true,
+      disableConfirmationListener: true
     },
-    
+
     mainnet: {
       provider: () => new HDWalletProvider(
         process.env.BIP39_MNEMONIC,
         "https://mainnet.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
       network_id: '1',
-      skipDryRun: true
+      production : true,
+      skipDryRun: false,
+      disableConfirmationListener: true
     },
 
     //Ropsten : PoW
@@ -82,7 +85,8 @@ module.exports = {
       network_id: '3',
       gas: 7E6,
       gasPrice: 1E10,
-      skipDryRun: true
+      skipDryRun: true,
+      disableConfirmationListener: true
     },
 
     //Rinkeby : PoA
@@ -101,9 +105,10 @@ module.exports = {
       network_id: "4",
       // gas: 7E6,
       // gasPrice: 1E10,
-      skipDryRun: true
+      skipDryRun: true,
+      disableConfirmationListener: true
     },
-    
+
     rinkeby_ws: {
       provider: () => {
         // Monkey patch to support `web3.eth.subscribe()` function
@@ -119,7 +124,8 @@ module.exports = {
       },
       network_id: '4', //https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
       websockets: true,
-      skipDryRun: true
+      skipDryRun: true,
+      disableConfirmationListener: true
     },
 
     //Kovan : PoA
@@ -137,9 +143,10 @@ module.exports = {
       network_id: '42', //https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
       //gas: 7E6,
       //gasPrice: 5E10,
-      skipDryRun: true
+      skipDryRun: true,
+      disableConfirmationListener: true
     },
-    
+
     kovan_ws: {
       provider: () => {
         // Monkey patch to support `web3.eth.subscribe()` function
@@ -157,7 +164,8 @@ module.exports = {
       //gas: 7E6,
       //gasPrice: 5E10,
       websockets: true,
-      skipDryRun: true
+      skipDryRun: true,
+      disableConfirmationListener: true
     },
 
     // Goerli : PoA
@@ -173,9 +181,10 @@ module.exports = {
         pollingInterval: 15000
       }),
       network_id: '5',
-      skipDryRun: true
+      skipDryRun: true,
+      disableConfirmationListener: true
     },
-    
+
     // Klaytn Testnet
     baobab: {
       provider: () => new HDWalletProvider({
@@ -185,9 +194,10 @@ module.exports = {
         pollingInterval: 2000
       }),
       network_id: '1001',
-      skipDryRun: true
+      skipDryRun: true,
+      disableConfirmationListener: true
     },
-    
+
     // Binance Smart Chain Testnet
     // https://docs.binance.org/smart-chain/developer/deploy/truffle.html
     // GitHub :
@@ -203,9 +213,10 @@ module.exports = {
       network_id: '97',
       confirmations: 10,
       timeoutBlocks: 200,
-      skipDryRun: true
+      skipDryRun: true,
+      disableConfirmationListener: true
     },
-    
+
   },
 
   // https://github.com/mochajs/mocha/blob/v8.1.2/lib/mocha.js#L97
