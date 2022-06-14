@@ -6,10 +6,9 @@ cd "${script_dir}"
 readonly eth_ver=`cat ../ganache-cli.properties | grep -E "^ethereum\.netVersion=" | sed -E 's/ethereum\.netVersion=//'`
 readonly eth_host=`cat ../ganache-cli.properties | grep -E "^ethereum\.host=" | sed -E 's/ethereum\.host=//'`
 readonly eth_port=`cat ../ganache-cli.properties | grep -E "^ethereum\.port=" | sed -E 's/ethereum\.port=//'`
-readonly eth_gas_price=`cat ../ganache-cli.properties | grep -E "^ethereum\.gasPrice=" | sed -E 's/ethereum\.gasPrice=//'`
-readonly eth_gas_limit=`cat ../ganache-cli.properties | grep -E "^ethereum\.gasLimit=" | sed -E 's/ethereum\.gasLimit=//'`
-readonly eth_block_time=`cat ../ganache-cli.properties | grep -E "^ethereum\.blockTime=" | sed -E 's/ethereum\.blockTime=//'`
-readonly eth_keys=`cat ../ganache-cli.properties | grep -E "^ethereum\.keys" | sed -E 's/ethereum\.keys\.[0-9]*=//'`
+# readonly eth_gas_limit=`cat ../ganache-cli.properties | grep -E "^ethereum\.gasLimit=" | sed -E 's/ethereum\.gasLimit=//'`
+# readonly eth_block_time=`cat ../ganache-cli.properties | grep -E "^ethereum\.blockTime=" | sed -E 's/ethereum\.blockTime=//'`
+# readonly eth_keys=`cat ../ganache-cli.properties | grep -E "^ethereum\.keys" | sed -E 's/ethereum\.keys\.[0-9]*=//'`
 
 declare cnt=1
 

@@ -89,22 +89,23 @@ fi
 
 cd "${script_dir}"
 
-readonly eth_ver=`cat ganache-cli.properties | grep -E "^ethereum\.netVersion=" | sed -E 's/ethereum\.netVersion=//'`
+readonly eth_chain_id=`cat ganache-cli.properties | grep -E "^ethereum\.chainId=" | sed -E 's/ethereum\.chainId=//'`
 readonly eth_host=`cat ganache-cli.properties | grep -E "^ethereum\.host=" | sed -E 's/ethereum\.host=//'`
 readonly eth_port=`cat ganache-cli.properties | grep -E "^ethereum\.port=" | sed -E 's/ethereum\.port=//'`
-readonly eth_gas_price=`cat ganache-cli.properties | grep -E "^ethereum\.gasPrice=" | sed -E 's/ethereum\.gasPrice=//'`
-readonly eth_gas_limit=`cat ganache-cli.properties | grep -E "^ethereum\.gasLimit=" | sed -E 's/ethereum\.gasLimit=//'`
+readonly eth_block_gas_limit=`cat ganache-cli.properties | grep -E "^ethereum\.blockGasLimit=" | sed -E 's/ethereum\.blockGasLimit=//'`
+readonly eth_default_tx_gas_limit=`cat ganache-cli.properties | grep -E "^ethereum\.defaultTxGasLimit=" | sed -E 's/ethereum\.defaultTxGasLimit=//'`
 readonly eth_block_time=`cat ganache-cli.properties | grep -E "^ethereum\.blockTime=" | sed -E 's/ethereum\.blockTime=//'`
 readonly eth_hardfork=`cat ganache-cli.properties | grep -E "^ethereum\.hardfork" | sed -E 's/ethereum\.hardfork=//'`
 readonly eth_keys=`cat ganache-cli.properties | grep -E "^ethereum\.keys" | sed -E 's/ethereum\.keys\.[0-9]*=//'`
 
-
 if [ $verbose -ne 0 ]; then
-  echo "Ethereum Network ID : $eth_ver"
-  echo "Ethereum Client Host Address: $eth_host"
-  echo "Ethereum Client TCP Port: $eth_port"
-  echo "Ethereum Gas Limit: $eth_gas_limit"
-  echo "Ethereum Gas Price: $eth_gas_price"
+  echo "Ethereum Chain ID: $eth_chain_id"
+  echo "Ethereum Hardfork: $eth_hardfork"
+  echo "Ethereum Node Host Address: $eth_host"
+  echo "Ethereum Node TCP Port: $eth_port"
+  echo "Ethereum Block Gas Limit: $eth_block_gas_limit"
+  echo "Ethereum Default Transaction Gas Limit: $eth_default_tx_gas_limit"
+  echo "Ethereum Block Time: $eth_block_time sec"
   echo "Ethereum Private Keys for Accounts: "
   for key in $eth_keys; do echo "    $key"; done
   echo "uname: $uname"
@@ -132,42 +133,38 @@ Darwin*) #Bash on macOS
   exit 600
 esac
 
-# Ganache CLI : https://github.com/trufflesuite/ganache-cli#using-ganache-cli
+# Ganache : https://github.com/trufflesuite/ganache#documentation
 # BIP 32 : https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki
 # BIP 39 : https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
-#
-# Options
-#   - gasLimit : The block gas limit (defaults to 0x6691b7)
-#   - gasPrice: The price of gas in wei (defaults to 20000000000)
-
-cmd="ganache-cli --networkId $eth_ver \
-            --host '$eth_host' \
-            --port $eth_port \
-            --gasPrice $eth_gas_price \
-            --gasLimit $eth_gas_limit"
+cmd="npx ganache --chain.networkId $eth_chain_id \
+            --chain.chainId $eth_chain_id \
+            --chain.hardfork $eth_hardfork \
+            --server.host '$eth_host' \
+            --server.port $eth_port \
+            --miner.blockGasLimit $eth_block_gas_limit \
+            --miner.defaultTransactionGasLimit $eth_default_tx_gas_limit \
+            --miner.blockTime $eth_block_time"
 
 if [ -n "$eth_keys" ]; then
   echo ""
   echo "Private keys for Ethereum accounts are explicitly specified. They will be used."
   for key in $eth_keys;
-    do cmd="${cmd} --account=\"${key},10000000000000000000000\""
+    do cmd="${cmd} --wallet.accounts=\"${key},10000000000000000000000\""
   done;
 else
   if [ -z "$BIP39_MNEMONIC" ]; then
     echo "'BIP39_MNEMONIC' env. variable is not defined, so implicit default mnemonic will be used."
     echo "If you want to use user defined mnemonic, define it via 'BIP39_MNEMONIC' env. variable and restart this script."
-    cmd="${cmd} --deterministic"
+    cmd="${cmd} --wallet.deterministic"
   else
     echo "'BIP39_MNEMONIC' env. variable is defined, so it will be used."
-    cmd="${cmd} --mnemonic '$BIP39_MNEMONIC'"
+    cmd="${cmd} --wallet.mnemonic '$BIP39_MNEMONIC'"
   fi
-  cmd="${cmd} --defaultBalanceEther 10000 --accounts 10 --secure"
+  cmd="${cmd} --wallet.totalAccounts 10 --wallet.defaultBalance 10000"
 fi
 
-cmd="${cmd} --unlock 0 --unlock 1 --unlock 2 --unlock 3 --unlock 4 \
-            --hardfork $eth_hardfork \
-            --blockTime $eth_block_time \
-            --db '${data_dir}' >> '${log_dir}'/ganache.log 2>&1"
+cmd="${cmd} --wallet.lock -u 0 -u 1 -u 2 -u 3 -u 4 -u 5 -u 6 -u 7 -u 8 -u 9 \
+            --database.dbPath '${data_dir}' >> '${log_dir}'/ganache.log 2>&1"
 
 if [ "$uname" == "Linux" ]; then
   cmd="sudo sh -c \"$cmd\""
