@@ -12,7 +12,7 @@ const config = fs.readFileSync('scripts/ganache-cli.properties').toString();
 const ganache = {
   host : config.match(/ethereum.host=.*/g)[0].substring(14),
   port : config.match(/ethereum.port=[0-9]*/g)[0].substring(14),
-  net : config.match(/ethereum.netVersion=[0-9]*/g)[0].substring(20),
+  net : config.match(/ethereum.chainId=[0-9]*/g)[0].substring(20),
   websocket: false
 }
 
@@ -37,7 +37,7 @@ const wsOptions = {
 }
 
 
-// http://truffleframework.com/docs/advanced/configuration
+// https://trufflesuite.com/docs/truffle/reference/configuration/
 // https://infura.io/docs/gettingStarted/chooseaNetwork
 // https://ethereum.stackexchange.com/questions/27048/comparison-of-the-different-testnets
 module.exports = {
@@ -57,8 +57,7 @@ module.exports = {
       host: ganache.host,
       port: ganache.port,
       network_id: ganache.net,
-      gas: 3E8,
-      gasPrice: 0,
+      gas: 5E10,
       websockets: ganache.websocket,
       skipDryRun: true,
       disableConfirmationListener: true
@@ -83,8 +82,6 @@ module.exports = {
         process.env.BIP39_MNEMONIC,
         "https://ropsten.infura.io/v3/" + process.env.INFURA_PROJECT_ID),
       network_id: '3',
-      gas: 7E6,
-      gasPrice: 1E10,
       skipDryRun: true,
       disableConfirmationListener: true
     },
@@ -100,11 +97,9 @@ module.exports = {
           mnemonic: process.env.BIP39_MNEMONIC,
           providerOrUrl: new Web3HttpProvider(
             "https://rinkeby.infura.io/v3/" + process.env.INFURA_PROJECT_ID, httpOptions),
-          pollingInterval: "5500"
+          pollingInterval: 10000
         }),
       network_id: "4",
-      // gas: 7E6,
-      // gasPrice: 1E10,
       skipDryRun: true,
       disableConfirmationListener: true
     },
@@ -119,7 +114,7 @@ module.exports = {
         return new HDWalletProvider({
           mnemonic: process.env.BIP39_MNEMONIC,
           providerOrUrl: wsProvider,
-          pollingInterval: 5500
+          pollingInterval: 10000
         });
       },
       network_id: '4', //https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
@@ -141,8 +136,6 @@ module.exports = {
         pollingInterval: 2000
       }),
       network_id: '42', //https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
-      //gas: 7E6,
-      //gasPrice: 5E10,
       skipDryRun: true,
       disableConfirmationListener: true
     },
@@ -161,8 +154,6 @@ module.exports = {
         });
       },
       network_id: '42', //https://github.com/ethereum/wiki/wiki/JSON-RPC#net_version
-      //gas: 7E6,
-      //gasPrice: 5E10,
       websockets: true,
       skipDryRun: true,
       disableConfirmationListener: true
@@ -178,7 +169,7 @@ module.exports = {
         mnemonic: process.env.BIP39_MNEMONIC,
         providerOrUrl: new Web3HttpProvider(
           "https://goerli.infura.io/v3/" + process.env.INFURA_PROJECT_ID, httpOptions),
-        pollingInterval: 15000
+        pollingInterval: 10000
       }),
       network_id: '5',
       skipDryRun: true,
@@ -243,7 +234,7 @@ module.exports = {
           enabled: false,
           runs: 200
         },
-        evmVersion: "istanbul"  // berlin, istanbul, petersburg, constantinople, byzantium
+        //evmVersion: "istanbul"  // berlin, istanbul, petersburg, constantinople, byzantium
       }
     },
   },

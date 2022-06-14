@@ -23,19 +23,20 @@
   ],
   "dependencies": {
     "@openzeppelin/contracts": "3.4.2",
-    "@openzeppelin/contracts-4": "npm:@openzeppelin/contracts@4.5.0",
-    "@remix-project/remixd": "~0.5.0"
+    "@openzeppelin/contracts-4": "npm:@openzeppelin/contracts@4.5.0"
   },
   "devDependencies": {
     "@openzeppelin/test-environment": "~0.1.4",
     "@openzeppelin/test-helpers": "~0.5.6",
+    "@remix-project/remixd": "~0.5.1",
     "@truffle/hdwallet-provider": "~1.7.0",
     "chance": "^1.1.7",
     "elliptic": "6.5.4",
     "eth-lib": "0.2.8",
     "rlp": "~2.2.6",
     "secp256k1": "4.0.2",
-    "web3": "~1.5.1"
+    "web3": "~1.5.1",
+    "ganache": "^7.3.0"
   },
   "engines": {
     "node": ">=12.0"
@@ -46,7 +47,10 @@
       "https://github.com/OpenZeppelin/zeppelin-solidity#getting-started"
     ],
     "preinstall": "",
-    "remixd" : "./scripts/remixd-start.sh",
-    "ganache" : "./scripts/ganache-cli-start.sh"
+    "remixd": "./scripts/remixd-start.sh",
+    "ganache": "./scripts/ganache-cli-start.sh",
+    "ganache-refreshed": "./scripts/ganache-cli-start.sh -r",
+    "ganache-log": "tail -n 100 ./run/ganache/ganache.log",
+    "remove-remix-artifacts": "find contracts -type d -name artifacts -exec rm -Rf {} +"
   }
 }
