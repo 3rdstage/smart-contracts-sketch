@@ -56,7 +56,7 @@ module.exports = {
     development: {
       host: ganache.host,
       port: ganache.port,
-      network_id: ganache.net,
+      network_id: "*",
       gas: 5E10,
       websockets: ganache.websocket,
       skipDryRun: true,

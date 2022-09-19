@@ -45,4 +45,6 @@
 * `CountUp.sol`
 * `CountDown.sol`
 * `Adminable.sol`
+* `RegularERC721.sol`
+
 
