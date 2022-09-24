@@ -1,32 +1,32 @@
 * -text
 
-*.tag -text
-*.MF -text
 *.aj -text
-*.ftl -text
-*.mediawiki -text
-*.textile -text
-*.q -text
-*.g -text
-*.tokens -text
-*.script -text
 *.cfg -text
-.classpath -text
-.project -text
-.jsdtscope -text
-*.prefs -text
 *.component -text
+*.ftl -text
+*.g -text
+*.json -text
 *.launch -text
-.springBeans -text
-.euml2 -text
-.umlproject -text
-.clay -text
-.fbprefs -text
-.pmd -text
-.lint4jprefs -text
-.jshintrc -text
-
+*.mediawiki -text
+*.MF -text
+*.prefs -text
+*.q -text
+*.script -text
 *.sol linguist-language=Solidity
+*.tag -text
+*.textile -text
+*.tokens -text
+.classpath -text
+.clay -text
+.euml2 -text
+.fbprefs -text
+.jsdtscope -text
+.jshintrc -text
+.lint4jprefs -text
+.pmd -text
+.project -text
+.springBeans -text
+.umlproject -text
 
 # Declare files that will always have CRLF line endings on checkout.
 *.sln text eol=crlf

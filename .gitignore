@@ -9,7 +9,6 @@ CVS/
 
 # IDEs or tools related
 /.idea/
-/.vscode/
 .gradle/
 
 # directories for intermediate or final compiled artifacts
