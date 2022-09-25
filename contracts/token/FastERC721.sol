@@ -1,16 +1,11 @@
-import "../../node_modules/@openzeppelin/contracts-4/token/ERC721/ERC721Burnable.sol";
-import "../../node_modules/@openzeppelin/contracts-4/token/ERC721/ERC721Pausable.sol";
-import "../../node_modules/@openzeppelin/contracts-4/token/ERC721/ERC721URIStorage.sol";
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.8.0;
 
-contract FastERC721 is ERC721Pausable, ERC721Burnarable, ERC721URIStorage{
+import "../../node_modules/@openzeppelin/contracts-4/token/ERC721/extensions/ERC721Burnable.sol";
+import "../../node_modules/@openzeppelin/contracts-4/token/ERC721/extensions/ERC721Pausable.sol";
+import "../../node_modules/@openzeppelin/contracts-4/token/ERC721/extensions/ERC721URIStorage.sol";
 
-
-  constructor(string memory name, string memory symbol, string memory baseURI)
-    ERC721{
-
-
-  }
-
+abstract contract FastERC721{
 
 
 

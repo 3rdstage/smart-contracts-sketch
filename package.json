@@ -51,8 +51,8 @@
       "https://github.com/OpenZeppelin/zeppelin-solidity#getting-started"
     ],
     "preinstall": "",
-    "compile-contracts": "rm -Rf build/truffle/;truffle compile contracts/**/*.sol",
-    "generate-types": "rm -Rf types/truffle-contracts/;typechain --target=truffle-v5 'build/contracts/*.jsn'",
+    "compile-contracts": "truffle compile contracts/**/*.sol",
+    "generate-types": "typechain --target=truffle-v5 'build/truffle/*.json'",
     "remixd": "./scripts/remixd-start.sh",
     "ganache": "./scripts/ganache-cli-start.sh",
     "ganache-refreshed": "./scripts/ganache-cli-start.sh -r",
