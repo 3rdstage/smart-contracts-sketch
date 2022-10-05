@@ -32,6 +32,7 @@ CVS/
 /_site/
 .apt_generated/
 .atp_generated_tests/
+/types/
 
 # runtime outputs
 /run/

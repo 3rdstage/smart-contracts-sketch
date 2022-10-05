@@ -6,6 +6,8 @@ const HDWalletProvider = require("@truffle/hdwallet-provider");
 const Web3HttpProvider = require('web3-providers-http');
 const Web3WsProvider = require('web3-providers-ws');
 
+require('ts-node').register({files: true});
+
 // Read properties for local standalone Ganache CLI node
 const fs = require('fs');
 const config = fs.readFileSync('scripts/ganache-cli.properties').toString();
