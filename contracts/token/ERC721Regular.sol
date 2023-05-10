@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.7.0;
+pragma solidity ^0.8.0;
 
-import "../../node_modules/@openzeppelin/contracts/presets/ERC721PresetMinterPauserAutoId.sol";
+//import "../../node_modules/@openzeppelin/contracts-4/token/erc721/extensions/ERC721URIStorage.sol";
+import "../../node_modules/@openzeppelin/contracts-4/token/erc721/presets/ERC721PresetMinterPauserAutoId.sol";
 
 contract ERC721Regular is ERC721PresetMinterPauserAutoId{
 
@@ -9,7 +10,8 @@ contract ERC721Regular is ERC721PresetMinterPauserAutoId{
     }
     
     function setTokenURI(uint256 tokenId, string memory uri) public {
-        _setTokenURI(tokenId, uri);
+        // @TODO
+        //_setTokenURI(tokenId, uri);
     }
 
 }

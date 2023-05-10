@@ -23,12 +23,12 @@
   ],
   "dependencies": {
     "@openzeppelin/contracts": "3.4.2",
-    "@openzeppelin/contracts-4": "npm:@openzeppelin/contracts@4.5.0"
+    "@openzeppelin/contracts-4": "npm:@openzeppelin/contracts@4.7.3"
   },
   "devDependencies": {
     "@openzeppelin/test-environment": "~0.1.4",
     "@openzeppelin/test-helpers": "~0.5.6",
-    "@remix-project/remixd": "~0.5.1",
+    "@remix-project/remixd": "~0.6.1",
     "@truffle/hdwallet-provider": "~1.7.0",
     "chance": "^1.1.7",
     "elliptic": "6.5.4",
