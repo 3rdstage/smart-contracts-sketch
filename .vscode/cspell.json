@@ -1,0 +1,89 @@
+// https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker
+// https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker#customization
+// https://github.com/streetsidesoftware/vscode-spell-checker
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "addr", // General abbreviation
+    "addrs",
+    "cntr",
+    "cntrs",
+    "contr",
+    "contrs",
+    "fctr", // factory
+    "spcl", // special
+    "mintee",
+    "mintees",
+    "importee",
+    "rslt",
+    "testcases",
+    "preinstall",
+    "addn", // `bn.js`
+    "subn",
+    "pickone", // `chance.js`
+    "pickset",
+    "keccak", // Blockchain
+    "secp256k1",
+    "hdwallet",
+    "keypair",
+    "mainnet", // Ethereum
+    "testnet",
+    "chainid",
+    "ropsten",
+    "rinkeby",
+    "kovan",
+    "goerli",
+    "IERC",
+    "ganache",
+    "remix",
+    "remixd",
+    "typechain",
+    "solhint",
+    "mythril",
+    "struct", // Solidity
+    "structs",
+    "bytecode",
+    "inheritdoc",
+    "pausable",
+    "mload",
+    "websocket", // Technology general
+    "ipfs",
+    "skcc", // misc
+    "chainz",
+    "frozens",
+    "unfreezed",
+    "exportings",
+    "unexporting",
+    "privilegeds",
+    "Sangmoon"
+  ],
+  "flagWords": [
+    "hte"
+  ],
+  "enableFiletypes": [
+    "solidity"
+  ],
+  "ignorePaths": [ ],
+  "patterns": [
+    { "name" : "ipfs-url", "pattern": "/(?:ipfs|http|https)://.*Qm[0-9A-Za-z]*/"}
+  ],
+  "ignoreRegExpList": ["ipfs-url"],
+  "languageSettings": [
+    {
+      "languageId": "python",
+      "allowCompoundWords": true,
+      "dictionaries": [
+        "python"
+      ]
+    }
+  ],
+  "overrides": [
+    {
+      // https://jshint.com/docs/options/
+      "filename": ".jshintrc",
+      "words": [
+        "esversion", "forin", "latedef", "nofunc", "noarg", "nonew", "quotmark"]
+    }
+  ]
+}

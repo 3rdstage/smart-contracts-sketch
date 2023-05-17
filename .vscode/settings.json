@@ -1,0 +1,56 @@
+{
+  "workbench.editor.revealIfOpen": false,
+
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.snippetSuggestions": "bottom",
+  "editor.wordBasedSuggestions": false,
+  "editor.suggestSelection": "recentlyUsedByPrefix",
+
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+
+  "files.exclude": {
+    "node_modules/[!@]*": true,
+    "node_modules/@[!o]*": true,
+    "node_modules/@openzeppelin/contract-loader": true,
+    "node_modules/@openzeppelin/test*": true,
+    "node_modules/@openzeppelin/contract*/build": true,
+    "contracts/**/artifacts": true,
+    ".pytest_cache": true,
+    "run/ganache/data": true,
+    "run/geth/data": true,
+    "run/besu/data": true
+  },
+
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/.hg/store/**": true,
+    "**/node_modules/*/**": true,
+    "contracts/**/artifacts/**": true,
+    "types/truffle-contracts/**": true,
+    "run/ganache/data/**": true,
+    "run/geth/data/**": true,
+    "run/besu/data/**": true
+  },
+
+  "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+  "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+  "js/ts.implicitProjectConfig.checkJs": false,
+
+  "jshint.enable" : true,
+  "jshint.config": ".jshintrc",
+  "tslint.enable": false,
+  "tslint.exclude": "tsconfig.json",
+  "eslint.enable": false,
+
+  "solidity-va.codelens.inheritance.enable": true,
+
+  "plantuml.fileExtensions": ".pu,.puml,.plantuml",
+  "plantuml.exportSubFolder": false,
+  "plantuml.exportOutDir": "."
+
+}
