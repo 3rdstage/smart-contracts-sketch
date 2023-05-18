@@ -3,7 +3,10 @@ pragma solidity ^0.8.0;
 
 // https://solidity-by-example.org/app/multi-sig-wallet/
 
-contract MultisigTransfer{
+contract MultisigWallet{
+
+  // Wallet without private keys
+  // Waiting line or lounge rather than wallet
 
   // Transaction State-chart
   //
@@ -103,8 +106,70 @@ contract MultisigTransfer{
       notExecuted(txNo) notConfirmed(txNo){
 
     Transaction storage tx_ = _txs[txNo];
+    tx_.confirms += 1;
+    _isConfirmed[txNo][msg.sender] = true;
 
+    emit Confirm(msg.sender, txNo);
+  }
+
+  function revokeTx(uint256 txNo)
+    public onlyOwner exists(txNo)
+      notExecuted(txNo) {
+
+    require(_isConfirmed[txNo][msg.sender], "Tx not yet confirmed.");
+
+    Transaction storage tx_ = _txs[txNo];
+    tx_.confirms -= 1;
+    _isConfirmed[txNo][msg.sender] = false;
+
+    emit Revoke(msg.sender, txNo);
 
   }
 
+  function executeTx(uint256 txNo)
+    public onlyOwner exists(txNo) notExecuted(txNo){
+
+    Transaction storage tx_ = _txs[txNo];
+    require(tx_.confirms >= _threshold, "Need more confirms");
+    tx_.executed = true;
+
+    emit Execute(msg.sender, txNo);
+    (bool success, ) = tx_.to.call{value: tx_.value}(tx_.data);
+    require(success, "Tx failed.");
+
+  }
+
+  function owners() external view returns(address[] memory){
+    return _owners;
+  }
+
+  function threshold() external view returns(uint256){
+    return _threshold;
+  }
+
+  function txCount() external view returns(uint256){
+    return _txs.length;
+  }
+
+  function getTx(uint256 txNo) public view
+    returns(address to, uint256 value, bytes memory data, bool executed, uint256 confirms){
+
+    Transaction memory tx_ = _txs[txNo];
+
+    return (tx_.to, tx_.value, tx_.data, tx_.executed, tx_.confirms);
+  }
+
+}
+
+contract CallMeContract{
+
+  uint256 private i;
+
+  function callMe(uint256 j) public{
+    i += j;
+  }
+
+  function getData() public pure returns(bytes memory){
+    return abi.encodeWithSignature("callMe(uint256)", 123);
+  }
 }
