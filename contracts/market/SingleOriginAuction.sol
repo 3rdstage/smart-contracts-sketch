@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/math/Math.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import './ISingleOriginAuction.sol';
-import '../utils/PagedListHolder.sol';
+import "./ISingleOriginAuction.sol";
+import "../utils/PagedListHolder.sol";
 
 contract SingleOriginAuction is ISingleOriginAuction, PagedListHolder(10){
     using EnumerableSet for EnumerableSet.UintSet;
