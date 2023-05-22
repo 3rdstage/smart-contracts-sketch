@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.6.0;
 
-import '@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol';
+import "../../node_modules/@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol";
 
 // ERC20PresetMinterPauser.sol : https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v3.1.0/contracts/presets/ERC20PresetMinterPauser.sol
 // ERC20.sol : https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v3.1.0/contracts/token/ERC20/ERC20.sol
@@ -9,7 +9,7 @@ import '@openzeppelin/contracts/presets/ERC20PresetMinterPauser.sol';
 // ERC20Pausable.sol : https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v3.1.0/contracts/token/ERC20/ERC20Pausable.sol
 
 contract ERC20Regular is ERC20PresetMinterPauser{
-
+    
   modifier onlyAdmin(){
       require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Aadmin role is required to do this");
       _;

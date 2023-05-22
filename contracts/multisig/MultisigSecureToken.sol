@@ -55,7 +55,6 @@ contract MultisigLounge is Context{
 
   modifier onlyMember(){
     require(_members.contains(_msgSender()), "Allowed for only members.");
-    _;
   }
 
   function grantAdmin(address acct) external onlyAdmin(){
