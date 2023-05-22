@@ -55,6 +55,8 @@ Gemfile.lock
 __pycache__/
 .pytest_cache/
 packer_cache/
+/temp
+/hardhat/cache/
 
 # misc
 config.gypi

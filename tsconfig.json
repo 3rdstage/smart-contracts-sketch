@@ -1,20 +1,28 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es2020",
     "module": "commonjs",
     "moduleResolution": "node",
-    "lib": ["es2015"],
+    "resolveJsonModule": true,
+    "typeRoots": ["node_modules/@types", "types"],
+    "types": ["node", "mocha", "chance", "chai", "truffle-contracts"],
     "strict": true,
     "alwaysStrict": true,
-    "sourceMap": true,
-    "noImplicitAny": true,
     "noImplicitThis": true,
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["es2015"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["node_modules/@types", "types"],
-    "types": ["node", "mocha", "chance", "chai", "truffle-contracts"]
+    "skipLibCheck": true
   },
-  "include": ["test/**/*.ts", "migrations/**/*.ts"],
-  "exclude": ["node_modules", "build", "scripts"]
+  "watchOptions": {
+    "excludeDirectories": ["**/node_modules", "build"],
+    "excludeFiles": ["tsconfig.js"]
+  },
+
+  "include": ["test/**/*.ts", "test/**/*.js", "migrations/**/*.ts"],
+  "exclude": ["node_modules", "build", "scripts", "tsconfig.js"]
 }
