@@ -5,26 +5,21 @@ pragma solidity ^0.8.0;
 //import '@openzeppelin/contracts/access/IAccessControl.sol';
 import {ISecurityAccessControl} from './ISecurityAccessControl.sol';
 
-/**
- * @title Interface for regular security token contract
- * @author Sangmoon Oh
- * @dev
- *
- * <ul>
- *   <li>Initially the contract is issuable and not paused.</li>
- *   <li>The operator MUST NOT be the owner of the approved tokens.</li>
- *   <li>The owner CAN NOT approve him or herself.</li>
- *   <li>Zero amount token movements (transfer, issuance, redemption) is NOT allowed.</li>
- *   <li>Zero supply cap means there's no upper-limit on total supply.</li>
- *   <li>Idempotence is preferred for state change.</li>
- *   <li>Both `Issued` and `Transfer` events are emitted for token issuance to comply ERC-20 and ERC-1400
- *   <li>Both `Redeemed` and `Transfer` events are emitted for token redemption to comply ERC-20 and ERC-1400
- * </ul>
- *
- * @custom:since 2023-04-06
- * @custom:see https://github.com/ethereum/EIPs/issues/1411
- * @custom:see https://eips.ethereum.org/EIPS/eip-20
- */
+
+/// @title Interface for practical and regular security token contract
+/// @author Sangmoon Oh
+/// @notice
+///      - Initially the contract is issuable and not paused.
+///      - The operator **MUST** **NOT** be the owner of the approved tokens.
+///      - The owner **CAN** **NOT** approve him or herself.
+///      - Zero amount token movements (transfer, issuance, redemption) is **NOT** allowed.
+///      - Zero supply cap means there's no upper-limit on total supply.
+///      - Idempotence is preferred for state change.
+///      - Both **`Issued`** and **`Transfer`** events are emitted for token issuance to comply ERC-20 and ERC-1400.
+///      - Both **`Redeemed`** and **`Transfer`** events are emitted for token redemption to comply ERC-20 and ERC-1400.
+/// @custom:since 2023-04-06
+/// @custom:see 'https://github.com/ethereum/EIPs/issues/1411'
+/// @custom:see 'https://eips.ethereum.org/EIPS/eip-20'
 interface IRegularSecurity is ISecurityAccessControl{
 
 
