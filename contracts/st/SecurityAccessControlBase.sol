@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 
 import {ISecurityAccessControl} from './ISecurityAccessControl.sol';
 import {AccessControl} from './access/AccessControl.sol'; //library
-import {Context} from "@openzeppelin/contracts/utils/Context.sol";
+import {Context} from "@openzeppelin/contracts-4/utils/Context.sol";
 
 /**
  * @title Typical access control implementation for security token contracts.

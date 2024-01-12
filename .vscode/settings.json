@@ -5,7 +5,7 @@
   "editor.detectIndentation": false,
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.snippetSuggestions": "bottom",
-  "editor.wordBasedSuggestions": false,
+  "editor.wordBasedSuggestions": "off",
   "editor.suggestSelection": "recentlyUsedByPrefix",
 
   "files.encoding": "utf8",

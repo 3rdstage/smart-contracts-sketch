@@ -6,8 +6,8 @@ import {IERC20Errors} from "./interface/IERC20Errors.sol";
 import {ISecurityTokenErrors} from "./interface/ISecurityTokenErrors.sol";
 import {IRegularSecurity} from "./IRegularSecurity.sol";
 import {SecurityAccessControlBase} from "./SecurityAccessControlBase.sol";
-import {Context} from "@openzeppelin/contracts/utils/Context.sol";
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {Context} from "@openzeppelin/contracts-4/utils/Context.sol";
+import {EnumerableSet} from "@openzeppelin/contracts-4/utils/structs/EnumerableSet.sol";
 
 contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegularSecurity, SecurityAccessControlBase{
   using EnumerableSet for EnumerableSet.AddressSet;
@@ -19,9 +19,6 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
   uint256 private _cap; // max supply or supply cap : total supply <= cap
 
   mapping(address => uint256) private _balances;
-
-  EnumerableSet.AddressSet private _vholders; // virtual holders for indirect transfers
-  mapping(address => int256) private _vbalances; // balances for virtual holders
 
   mapping(address => mapping(address => bool)) internal _operators;  // holder/operator/boolean
 
@@ -89,8 +86,6 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
 
   function balanceOf(address account)
       external view override returns(uint256 balance){
-    require(!_vholders.contains(account), "Virtual holder");
-
     balance = _balances[account];
   }
 
@@ -175,58 +170,11 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
     bool fromVirtual, bool toVirtual) internal virtual{ } // solhint-disable-line no-empty-blocks
 
 
-  function balanceOfVirtual(address account)
-      external view override returns(int256 balance){
-    if(!_vholders.contains(account)){ revert STNotVirtualAccount(account); }
-
-    balance = _vbalances[account];
-  }
-
-  function transferFromVirtual(address recipient, uint256 amount)
-      external override{
-
-    if(_isPaused()){ revert STPausedState(); }
-    if(recipient == address(0)){ revert ERC20InvalidReceiver(address(0)); }
-    address sender = _msgSender();
-    if(!_vholders.contains(sender)){ revert STNotVirtualSender(sender); }
-
-    _beforeTransfer(sender, recipient, amount, true, false);
-    unchecked{
-      _vbalances[sender] -= int256(amount);
-      _balances[recipient] += amount;
-    }
-    _afterTransfer(sender, recipient, amount, true, false);
-
-    emit Transfer(sender, recipient, amount);
-  }
-
-  function transferToVirtual(address recipient, uint256 amount)
-      external override{
-
-    if(_isPaused()){ revert STPausedState(); }
-    if(recipient == address(0)){ revert ERC20InvalidReceiver(address(0)); }
-    if(!_vholders.contains(recipient)){ revert STNotVirtualReceiver(recipient); }
-
-    address sender = _msgSender();
-    if(_balances[sender] < amount){
-      revert ERC20InsufficientBalance(sender, _balances[sender], amount);
-    }
-
-    _beforeTransfer(sender, recipient, amount, false, true);
-    unchecked{
-      _balances[sender] -= amount;
-      _vbalances[recipient] += int256(amount);
-    }
-    _afterTransfer(sender, recipient, amount, false, true);
-
-    emit Transfer(sender, recipient, amount);
-  }
-
   function authorizeOperator(address operator) external override{
 
-    if(operator == address(0)){ revert STInvalidOperator(address(0)); }
     address holder = _msgSender();
-    if(holder == operator){ revert STInvalidOperator(operator); }
+    if(operator == address(0)){ revert STInvalidOperator(address(0), holder); }
+    if(holder == operator){ revert STInvalidOperator(operator, holder); }
 
     _operators[holder][operator] = true;
     emit AuthorizedOperator(operator, holder);
@@ -234,9 +182,9 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
 
   function revokeOperator(address operator) external override{
 
-    if(operator == address(0)){ revert STInvalidOperator(address(0)); }
     address holder = _msgSender();
-    if(holder == operator){ revert STInvalidOperator(operator); }
+    if(operator == address(0)){ revert STInvalidOperator(address(0), holder); }
+    if(holder == operator){ revert STInvalidOperator(operator, holder); }
 
     _operators[holder][operator] = false;
     emit RevokedOperator(operator, holder);
@@ -431,7 +379,7 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
   function _updateSupplyCap(uint256 cap) internal virtual{
 
     if(cap > 0 && cap < _supply){ revert STInsufficientSupplyCap(cap, _supply); }
-    emit SupplyCapChanged(_cap, cap);
+    emit SupplyCapUpdated(_cap, cap);
     _cap = cap;
   }
 
@@ -470,12 +418,32 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
   }
 
 
+  function lockedBalanceOf(address holder)
+    public view returns(uint256 lockedBalance){
+
+    return 0;
+  }
+
+
+  function lock(address holder, uint256 more)
+    public returns(uint256 lockedBalance){
+
+    revert STNotYetImplemented();
+    // @TODO Needs implementation
+  }
+
+  function unlock(address holder, uint256 less)
+    public returns(uint256 lockedBalance){
+
+    revert STNotYetImplemented();
+    // @TODO Needs implementation
+  }
+
+
   function circulatingSupply() external override view returns(uint256 supply){
 
     revert STNotYetImplemented();
-
     // @TODO Needs implementation
-
   }
 
   function lockedSupply() external override view returns(uint256 supply){
@@ -484,4 +452,39 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
 
     // @TODO Needs implementation
   }
+
+
+  function bundleMaxSize() public view returns(uint256 max){
+
+    // @TODO Needs implementation
+    return 10;
+  }
+
+  function setBundleMaxSize(uint256 max) public{
+
+    revert STNotYetImplemented();
+    // @TODO Needs implementation
+  }
+
+
+  function bundleIssue(address[] memory holders, uint256[] memory amounts) public {
+
+    revert STNotYetImplemented();
+    // @TODO Needs implementation
+  }
+
+  function bundleTransfer(address[] memory recipients, uint256[] memory amounts) public{
+
+    revert STNotYetImplemented();
+    // @TODO Needs implementation
+  }
+
+  function bundleTransfer(address[] memory senders,
+      address[] memory recipients, uint256[] memory amounts) public{
+
+    revert STNotYetImplemented();
+
+    // @TODO Needs implementation
+  }
+
 }

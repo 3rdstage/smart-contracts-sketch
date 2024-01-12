@@ -2,7 +2,7 @@
 // cspell:ignore vholder vholders vbalances
 pragma solidity ^0.8.0;
 
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {EnumerableSet} from "@openzeppelin/contracts-4/utils/structs/EnumerableSet.sol";
 
 library AccessControl{
   using EnumerableSet for EnumerableSet.AddressSet;
