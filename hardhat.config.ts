@@ -1,3 +1,5 @@
+import {HardhatUserConfig} from "hardhat/config";
+
 // https://hardhat.org/hardhat-runner/docs/config
 const config: HardhatUserConfig = {
 

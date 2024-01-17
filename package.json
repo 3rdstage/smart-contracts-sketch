@@ -39,8 +39,11 @@
     "chance": "^1.1.7",
     "elliptic": "6.5.4",
     "eth-lib": "0.2.8",
+    "hardhat": "~2.19.0",
     "rlp": "~2.2.6",
     "secp256k1": "4.0.2",
+    "truffle-contract-size": "^2.0.1",
+    "truffle-flattener": "~1.6.0",
     "typechain": "^8.1.0"
   },
   "engineStrict": true,

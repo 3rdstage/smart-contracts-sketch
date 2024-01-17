@@ -12,22 +12,44 @@ import {EnumerableSet} from "@openzeppelin/contracts-4/utils/structs/EnumerableS
 contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegularSecurity, SecurityAccessControlBase{
   using EnumerableSet for EnumerableSet.AddressSet;
 
+
   string private _name;
+
   string private _symbol;
+
   uint8 private immutable _decimals;
+
   uint256 private _supply; // total supply = circulating + locked = SUM(issued) - SUM(redeemed)
+
+  uint256 private _lockedSupply;
+
   uint256 private _cap; // max supply or supply cap : total supply <= cap
-
-  mapping(address => uint256) private _balances;
-
-  mapping(address => mapping(address => bool)) internal _operators;  // holder/operator/boolean
-
-  mapping(address => mapping(address => uint256)) internal _allowances; // holder/spender/amount
 
   bool private _issuable = true;
 
   bool private _paused = false;
 
+  uint16 private _maxBundleSize = 20;
+
+  // balance by holder
+  // this balance includes both transferable tokens and locked tokens
+  mapping(address => uint256) private _balances;
+
+  mapping(address => uint256) private _lockedBalances;
+
+  mapping(address => mapping(address => bool)) internal _operators;  // holder/operator/boolean
+
+  mapping(address => mapping(address => uint256)) internal _allowances; // holder/spender/amount
+
+  /// @notice Deploys a new instance of this contract
+  ///
+  /// @param name_  name (human readable title) of this security
+  /// @param symbol_  code or number to identify this security - usually governed by the authorities
+  /// @param decimals_  decimal
+  /// @param cap  max supply
+  /// @param admins  the array of accounts granted admin role - at least one account should be included
+  /// @param issuers  the array of accounts granted issuer role - at least one account should be included
+  /// @param controllers the array of accounts granted controller role - at least one account should be included
   constructor(
     string memory name_,
     string memory symbol_,
@@ -48,27 +70,30 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
 
   }
 
-  function name() external view override returns(string memory){
-    return _name;
+  /// @inheritdoc IRegularSecurity
+  function name() external view override returns(string memory name_){
+    name_ = _name;
   }
 
-  function symbol() external view override returns(string memory){
-    return _symbol;
+  /// @inheritdoc IRegularSecurity
+  function symbol() external view override returns(string memory symbol_){
+    symbol_ = _symbol;
   }
 
-  function decimals() external view override returns(uint8){
+  /// @inheritdoc IRegularSecurity
+  function decimals() external view override returns(uint8 decimals_){
     return _decimals;
   }
 
-  function totalSupply() external view override returns(uint256){
+  function totalSupply() external view override returns(uint256 supply_){
     return _supply;
   }
 
-  function isPaused() external view override returns (bool){
+  function isPaused() external view override returns (bool paused_){
     return _isPaused();
   }
 
-  function _isPaused() internal view virtual returns (bool){
+  function _isPaused() internal view virtual returns (bool paused_){
     return _paused;
   }
 
@@ -146,29 +171,27 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
     if(sender == address(0)){ revert ERC20InvalidSender(address(0)); }  // @NOTE Is this redundant?
     if(recipient == address(0)){ revert ERC20InvalidReceiver(address(0)); }
 
-    if(_balances[sender] < amount){
-      revert ERC20InsufficientBalance(sender, _balances[sender], amount);
+    if(_balances[sender] - _lockedBalances[sender] < amount){
+      revert STInsufficientUnlockedBalance(sender, _balances[sender] - _lockedBalances[sender], amount);
     }
 
-    _beforeTransfer(sender, recipient, amount, false, false);
+    _beforeTransfer(sender, recipient, amount);
     unchecked{
       _balances[sender] -= amount;
       _balances[recipient] += amount;
     }
-    _afterTransfer(sender, recipient, amount, false, false);
+    _afterTransfer(sender, recipient, amount);
 
     emit Transfer(sender, recipient, amount);
   }
 
-  function _beforeTransfer(
-    address sender, address recipient, uint256 amount,
-    bool fromVirtual, bool toVirtual) internal virtual{ // solhint-disable-line no-empty-blocks
+  function _beforeTransfer(address sender, address recipient,
+    uint256 amount) internal virtual{ // solhint-disable-line no-empty-blocks
   }
 
-  function _afterTransfer(
-    address sender, address recipient, uint256 amount,
-    bool fromVirtual, bool toVirtual) internal virtual{ } // solhint-disable-line no-empty-blocks
-
+  function _afterTransfer(address sender, address recipient,
+      uint256 amount) internal virtual{ // solhint-disable-line no-empty-blocks
+  }
 
   function authorizeOperator(address operator) external override{
 
@@ -195,17 +218,20 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
       return _operators[holder][operator];
   }
 
-
+  /// @notice
+  ///    Using this function is not recommended
   function canTransfer(address recipient, uint256 amount, bytes memory data)
     external override virtual view returns (bool, bytes1, bytes32){
 
-    // @TODO
+    return _canTransfer(_msgSender(), recipient, amount, data);
   }
 
+  /// @notice
+  ///    Using this function is not recommended
   function canTransferFrom(address sender, address recipient, uint256 amount, bytes memory data)
     external override virtual view returns (bool, bytes1, bytes32){
 
-    // @TODO
+    return _canTransfer(sender, recipient, amount, data);
   }
 
   /***
@@ -220,9 +246,14 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
             if(_supply + amount > _cap) return (false, 0x5A, bytes32(0));
           }
         }
+      } else { // transfer or redemption
+
+        unchecked{ // check holder/sender's unlocked balance
+          if(amount > _balances[sender] - _lockedBalances[sender]) return (false, 0x5A, bytes32(0));
+        }
       }
 
-      // @TODO
+      // finally, no abnormality
       return (true, 0x51, bytes32(0)); // 0x51 : Transfer Successful
   }
 
@@ -316,13 +347,13 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
 
     if(_isPaused()){ revert STPausedState(); }
     if(amount == 0){ revert STDisallowedAmount(0); }
-    uint256 balance = _balances[holder];
-    if(amount > balance){
-      revert ERC20InsufficientBalance(holder, balance, amount);
+    uint256 unlocked = _balances[holder] - _lockedBalances[holder];
+    if(amount > unlocked){
+      revert STInsufficientUnlockedBalance(holder, unlocked, amount);
     }
 
     unchecked{
-      _balances[holder] = balance - amount;
+      _balances[holder] -= amount;
       _supply -= amount;
     }
 
@@ -330,7 +361,7 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
     emit Transfer(holder, address(0), amount);
   }
 
-
+  // solhint-disable-next-line
   function isControllable() external override view returns (bool){
     return true;
   }
@@ -421,70 +452,241 @@ contract RegularSecurity is Context, IERC20Errors, ISecurityTokenErrors, IRegula
   function lockedBalanceOf(address holder)
     public view returns(uint256 lockedBalance){
 
-    return 0;
+    lockedBalance = _lockedBalances[holder];
   }
 
-
+  /// @inheritdoc IRegularSecurity
   function lock(address holder, uint256 more)
     public returns(uint256 lockedBalance){
 
-    revert STNotYetImplemented();
-    // @TODO Needs implementation
+    if(_isPaused()){ revert STPausedState(); }
+    if(!_hasControllerRole(_msgSender())){
+      revert ACUnauthorizedAccess(CONTROLLER_ROLE, _msgSender());
+    }
+    if(more == 0){ revert STDisallowedAmount(0); }
+
+    uint256 balance = _balances[holder];
+    uint256 locked = _lockedBalances[holder];
+    if(more > balance - locked){
+      revert ERC20InsufficientBalance(holder, balance, locked + more);
+    }
+
+    unchecked{
+      _lockedBalances[holder] += more;
+      _lockedSupply += more;
+    }
+
+    lockedBalance = locked + more;
+    emit Locked(_msgSender(), holder, more, lockedBalance);
   }
 
+  /// @inheritdoc IRegularSecurity
   function unlock(address holder, uint256 less)
     public returns(uint256 lockedBalance){
 
-    revert STNotYetImplemented();
-    // @TODO Needs implementation
+    if(_isPaused()){ revert STPausedState(); }
+    if(!_hasControllerRole(_msgSender())){
+      revert ACUnauthorizedAccess(CONTROLLER_ROLE, _msgSender());
+    }
+    if(less == 0){ revert STDisallowedAmount(0); }
+
+    uint256 locked = _lockedBalances[holder];
+    if(less > locked){
+      revert STInsufficientLockedBalance(holder, locked, less);
+    }
+
+    unchecked{
+      _lockedBalances[holder] -= less;
+      _lockedSupply -= less;
+    }
+
+    lockedBalance = locked - less;
+    emit Unlocked(_msgSender(), holder, less, lockedBalance);
   }
 
-
+  /// @inheritdoc IRegularSecurity
   function circulatingSupply() external override view returns(uint256 supply){
 
-    revert STNotYetImplemented();
-    // @TODO Needs implementation
+    supply = _supply - _lockedSupply;
   }
 
+  /// @inheritdoc IRegularSecurity
   function lockedSupply() external override view returns(uint256 supply){
 
-    revert STNotYetImplemented();
-
-    // @TODO Needs implementation
+    supply = _lockedSupply;
   }
 
+  /// @inheritdoc IRegularSecurity
+  function bundleMaxSize() public view returns(uint16 max){
 
-  function bundleMaxSize() public view returns(uint256 max){
-
-    // @TODO Needs implementation
-    return 10;
+    max = _maxBundleSize;
   }
 
-  function setBundleMaxSize(uint256 max) public{
+  /// @inheritdoc IRegularSecurity
+  function setBundleMaxSize(uint16 max) public{
 
-    revert STNotYetImplemented();
-    // @TODO Needs implementation
+    if(max == 0){ revert STDisallowedNumber(max); }
+
+    _maxBundleSize = max;
+    emit BundleMaxSizeUpdated(max);
   }
 
-
+  /// @inheritdoc IRegularSecurity
   function bundleIssue(address[] memory holders, uint256[] memory amounts) public {
 
-    revert STNotYetImplemented();
-    // @TODO Needs implementation
+    address spender = _msgSender();
+    if(!_hasIssuerRole(spender)){
+      revert ACUnauthorizedAccess(ISSUER_ROLE, spender);
+    }
+    if(!_isIssuable()){ revert STUnissuableState(); }
+    if(_isPaused()){ revert STPausedState(); }
+
+    uint256 length1 = holders.length;
+    uint256 length2 = amounts.length;
+
+    if(length1 != length2){
+      uint256[] memory lengths = new uint256[](2);
+      lengths[0] = length1;
+      lengths[1] = length2;
+      revert STUnevenSizedPairedArgs(lengths);
+    }else if(length1 > _maxBundleSize){
+      revert STTooLargeBundle(_maxBundleSize, length1);
+    }
+
+    address holder;
+    uint256 amount;
+    for(uint256 i = 0; i < length1; i++){
+      holder = holders[i];
+      amount = amounts[i];
+
+      if(holder == address(0)){ revert ERC20InvalidReceiver(address(0)); }
+      if(amount == 0){ revert STDisallowedAmount(0); }
+      if(_cap > 0){  // ensures total supply is not more than supply cap
+        unchecked{
+          if(_cap < _supply + amount){ revert STOverflowingSupply(); }
+        }
+      }
+
+      unchecked{  // increases holder's balance and total supply
+        _balances[holder] += amount;
+        _supply += amount;
+      }
+
+      emit Issued(spender, holder, amount, "");
+      emit Transfer(address(0), holder, amount);
+    }
   }
 
+  /// @inheritdoc IRegularSecurity
   function bundleTransfer(address[] memory recipients, uint256[] memory amounts) public{
 
-    revert STNotYetImplemented();
-    // @TODO Needs implementation
+    if(_isPaused()){ revert STPausedState(); }
+    address sender = _msgSender();
+    if(sender == address(0)){ revert ERC20InvalidSender(address(0)); }
+
+    uint256 length1 = recipients.length;
+    uint256 length2 = amounts.length;
+    if(length1 != length2){
+      uint256[] memory lengths = new uint256[](3);
+      lengths[0] = length1;
+      lengths[1] = length2;
+      revert STUnevenSizedPairedArgs(lengths);
+    }else if(length1 > _maxBundleSize){
+      revert STTooLargeBundle(_maxBundleSize, length1);
+    }
+
+    address recipient;
+    uint256 amount;
+    for(uint256 i = 0; i < length1; i++){
+      recipient = recipients[i];
+      amount = amounts[i];
+
+      if(recipient == address(0)){ revert ERC20InvalidReceiver(address(0)); }
+      if(amount == 0){ revert STDisallowedAmount(0); }
+      if(_balances[sender] < amount){
+        revert ERC20InsufficientBalance(sender, _balances[sender], amount);
+      }
+
+      _beforeTransfer(sender, recipient, amount);
+      unchecked{  // increases sender's balance and decreases recipient's balance
+        _balances[sender] -= amount;
+        _balances[recipient] += amount;
+      }
+      _afterTransfer(sender, recipient, amount);
+
+      emit Transfer(sender, recipient, amount);
+    }
   }
 
+  /// @inheritdoc IRegularSecurity
   function bundleTransfer(address[] memory senders,
       address[] memory recipients, uint256[] memory amounts) public{
 
-    revert STNotYetImplemented();
+    address spender = _msgSender();
+    if(!_hasControllerRole(spender)){
+      revert ACUnauthorizedAccess(CONTROLLER_ROLE, spender);
+    }
+    if(_isPaused()){ revert STPausedState(); }
 
-    // @TODO Needs implementation
+    uint256 length1 = senders.length;
+    uint256 length2 = recipients.length;
+    uint256 length3 = amounts.length;
+
+    if((length1 != length2) || (length2 != length3)){
+      uint256[] memory lengths = new uint256[](3);
+      lengths[0] = length1;
+      lengths[1] = length2;
+      lengths[2] = length3;
+      revert STUnevenSizedPairedArgs(lengths);
+    }else if(length1 > _maxBundleSize){
+      revert STTooLargeBundle(_maxBundleSize, length1);
+    }
+
+    address sender;
+    address recipient;
+    uint256 amount;
+    for(uint256 i = 0; i < length1; i++){
+      sender = senders[i];
+      recipient = recipients[i];
+      amount = amounts[i];
+
+      if(sender == address(0)){ revert ERC20InvalidSender(address(0)); }
+      if(recipient == address(0)){ revert ERC20InvalidReceiver(address(0)); }
+      if(amount == 0){ revert STDisallowedAmount(0); }
+      if(_balances[sender] < amount){
+        revert ERC20InsufficientBalance(sender, _balances[sender], amount);
+      }
+
+      _beforeTransfer(sender, recipient, amount);
+      unchecked{  // increases sender's balance and decreases recipient's balance
+        _balances[sender] -= amount;
+        _balances[recipient] += amount;
+      }
+      _afterTransfer(sender, recipient, amount);
+
+      emit Transfer(sender, recipient, amount);
+    }
   }
+
+  /// @inheritdoc IRegularSecurity
+  function bundleBalanceOf(address[] memory holders) public view
+    returns(uint256[] memory balances, uint256[] memory lockedBalances){
+
+    uint256 length = holders.length;
+    if(length > _maxBundleSize){
+      revert STTooLargeBundle(_maxBundleSize, length);
+    }
+
+    balances = new uint256[](length);
+    lockedBalances = new uint256[](length);
+
+    for(uint256 i = 0; i < length; i++){
+      balances[i] = _balances[holders[i]];
+      lockedBalances[i] = _lockedBalances[holders[i]];
+    }
+
+  }
+
+
 
 }

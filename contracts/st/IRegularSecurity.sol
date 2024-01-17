@@ -185,8 +185,8 @@ interface IRegularSecurity is ISecurityAccessControl{
   /// @notice Transfers `amount` of tokens to address `recipient`, and MUST fire the
   ///      `Transfer` event.
   ///      <p>
-  ///      This function SHOULD throw if the message caller’s account balance does
-  ///      not have enough tokens to spend.
+  ///      This function SHOULD throw if the message caller’s account unlocked balance
+  ///      is NOT enough.
   ///
   /// @param recipient address of account who would receive tokens
   /// @param amount the number of tokens to transfer
@@ -292,13 +292,16 @@ interface IRegularSecurity is ISecurityAccessControl{
   function canTransferFrom(address sender, address recipient, uint256 amount, bytes memory data) external view returns (bool, bytes1, bytes32);
 
   /// @notice This function must emit a `Transfer` event with details of the transfer.
+  ///
   /// @param recipient an account who receives tokens
   /// @param amount token amount to transfer
   /// @param data arbitrary data to be submitted alongside the transfer, for the token contract to interpret or record
   /// @custom:see https://github.com/SecurityTokenStandard/EIP-Spec/blob/master/eip/eip-1594.md#transferwithdata
   function transferWithData(address recipient, uint256 amount, bytes memory data) external;
 
-  /// @notice The spender (`msg.sender`) MUST have a sufficient `allowance` set and this `allowance` must be debited by the `amount`.
+  /// @notice The spender (`msg.sender`) MUST have a sufficient `allowance` set
+  ///     and this `allowance` must be debited by the `amount`.
+  ///
   /// @param sender an account who sends tokens
   /// @param recipient an account who receives tokens
   /// @param amount token amount to transfer
@@ -306,8 +309,10 @@ interface IRegularSecurity is ISecurityAccessControl{
   /// @custom:see https://github.com/SecurityTokenStandard/EIP-Spec/blob/master/eip/eip-1594.md#transferfromwithdata
   function transferFromWithData(address sender, address recipient, uint256 amount, bytes memory data) external;
 
-  /// @notice Semantics of this function is a little bit different from EIP-1410 in that
-  ///         token contract once set not to be issuable can be set back to be issuable later.
+  /// @notice Semantics of this function is a little bit different from EIP-1410
+  ///     in that token contract once set not to be issuable can be set back to
+  ///     be issuable later.
+  ///
   /// @custom:see 'https://github.com/SecurityTokenStandard/EIP-Spec/blob/master/eip/eip-1594.md#isissuable'
   function isIssuable() external view returns (bool);
 
@@ -446,9 +451,12 @@ interface IRegularSecurity is ISecurityAccessControl{
   /// @custom:throw `ERC20InsufficientBalance`
   function controllerRedeem(address holder, uint256 amount, bytes calldata data, bytes calldata controllerData) external;
 
-  // Extra function
 
-  // Issuable or Not
+  //////////////////////////////////////////////////
+  //
+  // Feature : 'Security Unissuable'
+  //
+  //////////////////////////////////////////////////
 
   /// @notice Emitted when this contract is set to issuable
   ///
@@ -475,9 +483,10 @@ interface IRegularSecurity is ISecurityAccessControl{
   /// @custom:throw `ACUnauthorizedAccess`
   function setIssuable(bool issuable) external;
 
+
   //////////////////////////////////////////////////
   //
-  // Feature : 'Security Pause' (a.k.a. Sidecar)
+  // Feature : 'Security Pause' (a.k.a. Sidecar or Circuit Break)
   //
   //////////////////////////////////////////////////
 
@@ -596,8 +605,7 @@ interface IRegularSecurity is ISecurityAccessControl{
   /// @param operator the account who signed the transaction for this lock
   /// @param holder the account whose tokens would be locked
   /// @param more the number of tokens locked this time
-  /// @param lockedBalance the number of all tokens locked for the `holder`
-  ///        after this lock
+  /// @param lockedBalance the number of locked tokens of the `holder` after this lock
   event Locked(address operator, address holder, uint256 more, uint256 lockedBalance);
 
 
@@ -606,55 +614,57 @@ interface IRegularSecurity is ISecurityAccessControl{
   /// @param operator the account who signed the transaction for this unlock
   /// @param holder the account whose tokens would be unlocked
   /// @param less the number of tokens unlocked this time
-  /// @param lockedBalance the number of all tokens locked for the `holder`
-  ///        after this unlock
+  /// @param lockedBalance the number of locked tokens of the `holder` after this unlock
   event Unlocked(address operator, address holder, uint256 less, uint256 lockedBalance);
 
-  /// @notice Lock some of holder's tokens.
-  ///         <p>
-  ///         Locked tokens are prohibited to transfer to others until unlocked later
-  ///         , although they are still considered to be owned by the <code>holder</code>
-  ///         <p>
-  ///         Preconditions :
-  ///         <li><code>hasControllerRole(msg.sender)</code>
-  ///         <li><code>isPaused()</code> <tt>==</tt> <code>false</code>
-  ///         <li><code>more</code> <tt>></tt> <code>0</code>
-  ///         <li><code>balanceOf(holder)</code> <tt>&ge;</tt> <code>more</code>
+  /// @notice Locks more tokens of the specified `holder`
+  ///     <p>
+  ///     Locked tokens are prohibited to transfer to others until unlocked later
+  ///     , although they are still considered to be owned by the <code>holder</code>
+  ///     <p>
+  ///     <li>When the security contract is <strong>paused</strong>, this function will fail.
+  ///     <li>This function requires caller(<code>msg.sender</code>) has
+  ///         <strong>controller</strong> role.
+  ///     <li>The number of tokens to lock more (<code>more</code>) should be positive.
+  ///     <li>If the <code>holder</code> does NOT have enough unlocked balance
+  ///         (i.e. <code>balance - locked-balance &lt; more</code>), this function will fail.
+  ///     <li>When successfully processed, this function will emit a <code>Locked</code> event.
   ///
   /// @param holder the account whose tokens would be locked
-  /// @param more the number of tokens to lock
-  /// @return lockedBalance the number of all tokens locked for the `holder`
-  ///         after this lock
+  /// @param more the number of tokens to lock this time - should be positive (<code>&gt; 0</code>)
+  /// @return lockedBalance the number of locked tokens of the `holder` after this lock
   /// @custom:emit `Locked`
   /// @custom:role `CONTROLLER_ROLE`
   /// @custom:throw `ACUnauthorizedAccess`
   /// @custom:throw `STPausedState`
   /// @custom:throw `STDisallowedAmount(0)`
   /// @custom:throw `ERC20InsufficientBalance`
+  /// @custom:see `unlock(address, uint256)`
   function lock(address holder, uint256 more) external returns(uint256 lockedBalance);
 
   /// @notice Unlock some of holder's tokens.
-  ///         <p>
-  ///         Locked tokens are prohibited to transfer to others until unlocked later
-  ///         , although they are still considered to be owned by the <code>holder</code>
-  ///         <p>
-  ///         Preconditions :
-  ///         <li><code>hasControllerRole(msg.sender)</code>
-  ///         <li><code>isPaused()</code> <tt>==</tt> <code>false</code>
-  ///         <li><code>less</code> <tt>></tt> <code>0</code>
-  ///         <li><code>lockedBalanceOf(holder)</code> <tt>&ge;</tt> <code>less</code>
-  ///
+  ///     <p>
+  ///     Locked tokens are prohibited to transfer to others until unlocked later
+  ///     , although they are still considered to be owned by the <code>holder</code>
+  ///     <p>
+  ///     <li>When the security contract is <strong>paused</strong>, this function will fail.
+  ///     <li>This function requires caller(<code>msg.sender</code>) has
+  ///         <strong>controller</strong> role.
+  ///     <li>The number of tokens to unlock (<code>less</code>) should be positive.
+  ///     <li>If the <code>holder</code> does NOT have enough locked balance
+  ///         (i.e. <code>locked-balance &lt; less</code>), this function will fail.
+  ///     <li>When successfully processed, this function will emit a <code>Unlocked</code> event.
+
   /// @param holder the account whose tokens would be unlocked
-  /// @param less the number of tokens to unlock
-  /// @return lockedBalance the number of all tokens locked for the `holder`
-  ///         after this unlock
-  ///
+  /// @param less the number of tokens to unlock this time
+  /// @return lockedBalance the number of locked tokens of the `holder` after this unlock
   /// @custom:emit `Unlocked`
   /// @custom:role `CONTROLLER_ROLE`
   /// @custom:throw `ACUnauthorizedAccess`
   /// @custom:throw `STPausedState`
   /// @custom:throw `STDisallowedAmount(0)`
   /// @custom:throw `STInsufficientLockedBalance`
+  /// @custom:see `lock(address, uint256)`
   function unlock(address holder, uint256 less) external returns(uint256 lockedBalance);
 
   /// @notice Returns the locked balance of specified <code>holder</code>
@@ -691,6 +701,7 @@ interface IRegularSecurity is ISecurityAccessControl{
   /// @custom:see `lockedSupply()`
   function circulatingSupply() external view returns(uint256 supply);
 
+
   //////////////////////////////////////////////////
   //
   // Feature : 'Bundled Processing'
@@ -701,7 +712,7 @@ interface IRegularSecurity is ISecurityAccessControl{
   ///         <p>
   ///         Note that this event will be fired even when the max size is
   ///         actually unchanged after the update.
-  event BundleMaxSizeUpdated(uint256 max);
+  event BundleMaxSizeUpdated(uint16 max);
 
   /// @notice Returns the maximum size of bundle for bundled processing
   ///         <p>
@@ -709,7 +720,7 @@ interface IRegularSecurity is ISecurityAccessControl{
   ///
   /// @return max the maximum size of bundle
   /// @custom:see `setBundleMaxSize()`
-  function bundleMaxSize() external view returns(uint256 max);
+  function bundleMaxSize() external view returns(uint16 max);
 
   /// @notice Updates the maximum size of bundle for bundled processing
   ///         <p>
@@ -726,7 +737,7 @@ interface IRegularSecurity is ISecurityAccessControl{
   /// @custom:emit `BundleMaxSizeUpdated`
   /// @custom:throw `ACUnauthorizedAccess`
   /// @custom:throw `STInvalidBundleMaxSize`
-  function setBundleMaxSize(uint256 max) external;
+  function setBundleMaxSize(uint16 max) external;
 
   /// @notice Increases the specified <code>holders</code>' balances as much as
   ///         specified <code>amounts</code>
@@ -755,6 +766,7 @@ interface IRegularSecurity is ISecurityAccessControl{
   /// @custom:throw `ACUnauthorizedAccess`
   /// @custom:throw `STUnissuableState`
   /// @custom:throw `STPausedState`
+  /// @custom:throw `STUnevenSizedPairedArgs`
   /// @custom:throw `STTooLargeBundle`
   /// @custom:throw `ERC20InvalidReceiver`
   /// @custom:throw `STDisallowedAmount`
@@ -784,6 +796,7 @@ interface IRegularSecurity is ISecurityAccessControl{
   /// @param amounts token amounts to issue
   /// @custom:emit `Transfer`
   /// @custom:throw `STPausedState`
+  /// @custom:throw `STUnevenSizedPairedArgs`
   /// @custom:throw `STTooLargeBundle`
   /// @custom:throw `ERC20InvalidReceiver`
   /// @custom:throw `STDisallowedAmount`
@@ -818,6 +831,7 @@ interface IRegularSecurity is ISecurityAccessControl{
   /// @custom:emit `Transfer`
   /// @custom:throw `ACUnauthorizedAccess`
   /// @custom:throw `STPausedState`
+  /// @custom:throw `STUnevenSizedPairedArgs`
   /// @custom:throw `STTooLargeBundle`
   /// @custom:throw `ERC20InvalidSender`
   /// @custom:throw `ERC20InvalidReceiver`
@@ -829,4 +843,22 @@ interface IRegularSecurity is ISecurityAccessControl{
       address[] memory recipients, uint256[] memory amounts) external;
 
 
+  /// @notice Gets balances and locked balances of the specified `holders`
+  ///     <p>
+  ///     This function is expected to be used when balances and locked balances
+  ///     of large number of holders at the same time, instead of calling
+  ///     as much times on <code>balanceOf()</code> and <code>lockedBalanceOf()</code>
+  ///     functions
+  ///     <p>
+  ///     Returned arrays are expected to have same length with input array (`holders`)
+  ///
+  /// @param holders the array of accounts - the size(length) should not be larger than max bundle size
+  /// @return balances an array containing the balances of specified holders in the same order.
+  /// @return lockedBalances an array containing the locked balances of specified holders in the same order.
+  /// @custom:throw `STTooLargeBundle`
+  /// @custom:see `bundleMaxSize()`
+  /// @custom:see `balanceOf(address)`
+  /// @custom:see `lockedBalanceOf(address)`
+  function bundleBalanceOf(address[] memory holders) external view
+    returns(uint256[] memory balances, uint256[] memory lockedBalances);
 }

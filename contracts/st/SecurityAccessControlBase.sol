@@ -29,8 +29,6 @@ import {Context} from "@openzeppelin/contracts-4/utils/Context.sol";
 abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
   using AccessControl for AccessControl.Role;
 
-  // @TODO adding `allowsNoIssuer`, `allowsNoController`
-
   bytes public constant ADMIN_ROLE = 'ADMIN_ROLE';
   bytes public constant ISSUER_ROLE = 'ISSUER_ROLE';
   bytes public constant CONTROLLER_ROLE = 'CONTROLLER_ROLE';
@@ -64,12 +62,13 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
     for(uint256 i = 0; i < n; i++){ _grant(controllers[i], _controllers); }
 
   }
+
   /**
-   * @dev Grant a `role` to an `account`
+   * @dev Grant a `role` to an `account`.
    *      <p>
    *      If the `account` already has the `role` before the function
    *      call, this function throws no exception and changes no states.
-   *      </P.
+   *      <p>
    *      This function doesn't emit any event.
    *
    * @custom:throw `ACInvalidRoleMember`
@@ -85,12 +84,13 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
   }
 
   /**
-   * @dev Revoke a `role` from an `account`
+   * @dev Revoke a `role` from an `account`.
    *      <p>
    *      If the `account` doesn't have the `role` before the function
    *      call, this function throws no exception and changes no states.
    *      <p>
    *      This function doesn't emit any event.
+   *
    * @param account from whom the role is revoked
    * @param role the role to revoke
    */
@@ -101,6 +101,7 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
     count = role.count();
   }
 
+  /// @inheritdoc ISecurityAccessControl
   function grantAdminRole(address account)
     external override returns(uint256 count){
 
@@ -111,6 +112,7 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
     emit AdminRoleGranted(account, count);
   }
 
+  /// @inheritdoc ISecurityAccessControl
   function revokeAdminRole(address account)
     external override returns(uint256 count){
 
@@ -125,6 +127,7 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
     }
   }
 
+  /// @inheritdoc ISecurityAccessControl
   function hasAdminRole(address account)
     external override view returns(bool){
     return _hasAdminRole(account);
@@ -135,13 +138,25 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
     return _admins.has(account);
   }
 
+  /// @inheritdoc ISecurityAccessControl
   function countAdminRoleMembers()
     external override view returns (uint256 count){
 
     return _admins.count();
   }
 
+  /// @inheritdoc ISecurityAccessControl
+  function getAllAdminRoleMembers()
+    external view returns(address[] memory accounts){
 
+    uint256 count = _admins.count();
+    accounts = new address[](count);
+    for(uint256 i = 0; i < count; i++){
+      accounts[i] = _admins.at(i);
+    }
+  }
+
+  /// @inheritdoc ISecurityAccessControl
   function grantIssuerRole(address account)
     external override returns(uint256 count){
 
@@ -152,6 +167,7 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
     emit IssuerRoleGranted(account, count);
   }
 
+  /// @inheritdoc ISecurityAccessControl
   function revokeIssuerRole(address account)
     external override returns(uint256 count){
 
@@ -166,6 +182,7 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
     }
   }
 
+  /// @inheritdoc ISecurityAccessControl
   function hasIssuerRole(address account)
     external override view returns(bool){
     return _hasIssuerRole(account);
@@ -176,12 +193,25 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
     return _issuers.has(account);
   }
 
+  /// @inheritdoc ISecurityAccessControl
   function countIssuerRoleMembers()
     external override view returns (uint256 count){
 
     return _issuers.count();
   }
 
+  /// @inheritdoc ISecurityAccessControl
+  function getAllIssuerRoleMembers()
+    external view returns(address[] memory accounts){
+
+    uint256 count = _issuers.count();
+    accounts = new address[](count);
+    for(uint256 i = 0; i < count; i++){
+      accounts[i] = _issuers.at(i);
+    }
+  }
+
+  /// @inheritdoc ISecurityAccessControl
   function grantControllerRole(address account)
     external override returns(uint256 count){
 
@@ -192,6 +222,7 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
     emit ControllerRoleGranted(account, count);
   }
 
+  /// @inheritdoc ISecurityAccessControl
   function revokeControllerRole(address account)
     external override returns(uint256 count){
 
@@ -206,6 +237,7 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
     }
   }
 
+  /// @inheritdoc ISecurityAccessControl
   function hasControllerRole(address account)
     external override view returns(bool){
     return _hasControllerRole(account);
@@ -216,9 +248,22 @@ abstract contract SecurityAccessControlBase is Context, ISecurityAccessControl{
     return _controllers.has(account);
   }
 
+  /// @inheritdoc ISecurityAccessControl
   function countControllerRoleMembers() external override view returns (uint256 count){
     return _controllers.count();
   }
+
+  /// @inheritdoc ISecurityAccessControl
+  function getAllControllerRoleMembers()
+    external view returns(address[] memory accounts){
+
+    uint256 count = _controllers.count();
+    accounts = new address[](count);
+    for(uint256 i = 0; i < count; i++){
+      accounts[i] = _controllers.at(i);
+    }
+  }
+
 
 }
 

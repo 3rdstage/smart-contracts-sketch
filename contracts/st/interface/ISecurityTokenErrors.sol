@@ -9,9 +9,19 @@ pragma solidity ^0.8.0;
  */
 interface ISecurityTokenErrors{
 
+
   error STInvalidOperator(address operator, address holder);
 
   error STDisallowedAmount(uint256 amount);
+
+  error STDisallowedNumber(uint256 number);
+
+  /// @notice Indicates that tow or more input arguments in array type
+  ///     have different length(size), although they are expected
+  ///     to have same length.
+  ///
+  /// @param lengths an array containing lengths of arguments under the concern
+  error STUnevenSizedPairedArgs(uint256[] lengths);
 
   /// @notice Indicates that the security is currently NOT allowed
   ///         to issue tokens (for example, before the public offering)
@@ -34,6 +44,12 @@ interface ISecurityTokenErrors{
   ///         to keep current total supply or larger than current cap
   error STExcessiveSupplyCapDecrease(uint256 cap, uint256 decrease, uint256 supply);
 
+  /// @notice Indicates an error related to the current **unlocked** balance of
+  ///     a <code>holder</code>.
+  ///     <p>
+  ///     Usually used in transfers or locks.
+  error STInsufficientUnlockedBalance(address holder, uint256 unlockedBalance, uint256 needed);
+
   /// @notice Indicate a failure when current locked balance of the <code>holder</code> is
   ///         NOT enough to unlock the <code>needed</code> tokens
   error STInsufficientLockedBalance(address holder, uint256 lockedBalance, uint256 needed);
@@ -52,29 +68,6 @@ interface ISecurityTokenErrors{
   /// @param max current max size for bundle
   /// @param size bundle size under processing
   error STTooLargeBundle(uint256 max, uint256 size);
-
-
-  /// @notice Indicates a failure that an account is not virtual account
-  ///         where virtual account is expected
-  error STNotVirtualAccount(address account);
-
-  /// @notice Indicates a failure that a sender is not virtual account
-  ///         where virtual account is expected
-  error STNotVirtualSender(address account);
-
-  /// @notice Indicates a failure that a receiver(recipient) is not virtual
-  ///         account where virtual account is expected
-  error STNotVirtualReceiver(address account);
-
-  /// @notice Indicate a failure that an account is virtual account
-  ///         where virtual account is never expected
-  error STUnexpectedVirtualAccount(address account);
-
-  /// @notice Indicates a failure where the invoker(`msg.sender`) of the
-  ///         function has not authorized
-  /// @custom:deprecated
-  //error STUnauthorizedInvoker(bytes32 role, address invoker);
-
 
   /// @notice Indicates that the function is not yet implemented even
   ///         though declared.
