@@ -1,11 +1,11 @@
 ## Token Features
 
 * Blacklist
-* Watchlist
+* Watch-list
 * Transfer Limit
     * Single transfer limit
     * Daily transfer limit
-* Deplayed Transfer
+* Delayed Transfer
 * Scheduled Transfer
 * Classified Accounts
 
