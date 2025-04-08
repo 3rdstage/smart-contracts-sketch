@@ -1,4 +1,6 @@
 {
+  "workbench.editor.revealIfOpen": false,
+
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
   "editor.acceptSuggestionOnCommitCharacter": false,
@@ -6,15 +8,17 @@
   "editor.wordBasedSuggestions": "off",
   "editor.suggestSelection": "recentlyUsedByPrefix",
 
-  "debug.console.fontSize": 16,
-  "terminal.integrated.fontSize": 16,
-
   "files.encoding": "utf8",
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
 
   "files.exclude": {
-    "node_modules/**": true,
+    "node_modules/[!@]*": true,
+    "node_modules/@[!o]*": true,
+    "node_modules/@openzeppelin/contract-loader": true,
+    "node_modules/@openzeppelin/test*": true,
+    "node_modules/@openzeppelin/contract*/build": true,
+    "contracts/**/artifacts": true,
     ".pytest_cache": true,
     "run/ganache/data": true,
     "run/geth/data": true,
@@ -33,10 +37,20 @@
     "run/besu/data/**": true
   },
 
+  "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+  "typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+  "js/ts.implicitProjectConfig.checkJs": false,
+
   "jshint.enable" : true,
   "jshint.config": ".jshintrc",
+  "tslint.enable": false,
+  "tslint.exclude": "tsconfig.json",
+  "eslint.enable": false,
 
-  "cSpell.enableFiletypes": [
-    "solidity"
-  ]
+  "solidity-va.codelens.inheritance.enable": true,
+
+  "plantuml.fileExtensions": ".pu,.puml,.plantuml",
+  "plantuml.exportSubFolder": false,
+  "plantuml.exportOutDir": "."
+
 }
