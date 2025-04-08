@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "module": "commonjs",
+    "module": "CommonJS",
     "moduleResolution": "node",
-    "lib": ["es2015"],
+    "lib": ["es2017"],
+    "sourceMap": true,
     "strict": true,
     "alwaysStrict": true,
-    "sourceMap": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
     "experimentalDecorators": true,
@@ -15,6 +15,6 @@
     "typeRoots": ["node_modules/@types", "types"],
     "types": ["node", "mocha", "chance", "chai", "truffle-contracts"]
   },
-  "include": ["test/**/*.ts", "migrations/**/*.ts"],
+  "include": ["types/**/*.ts", "test/**/*.ts", "migrations/**/*.ts"],
   "exclude": ["node_modules", "build", "scripts"]
 }

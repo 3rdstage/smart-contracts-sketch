@@ -1,0 +1,42 @@
+{
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.snippetSuggestions": "bottom",
+  "editor.wordBasedSuggestions": "off",
+  "editor.suggestSelection": "recentlyUsedByPrefix",
+
+  "debug.console.fontSize": 16,
+  "terminal.integrated.fontSize": 16,
+
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+
+  "files.exclude": {
+    "node_modules/**": true,
+    ".pytest_cache": true,
+    "run/ganache/data": true,
+    "run/geth/data": true,
+    "run/besu/data": true
+  },
+
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/.hg/store/**": true,
+    "**/node_modules/*/**": true,
+    "contracts/**/artifacts/**": true,
+    "types/truffle-contracts/**": true,
+    "run/ganache/data/**": true,
+    "run/geth/data/**": true,
+    "run/besu/data/**": true
+  },
+
+  "jshint.enable" : true,
+  "jshint.config": ".jshintrc",
+
+  "cSpell.enableFiletypes": [
+    "solidity"
+  ]
+}
